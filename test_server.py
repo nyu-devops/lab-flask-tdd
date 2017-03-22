@@ -85,6 +85,10 @@ class TestPetServer(unittest.TestCase):
         resp = self.app.put('/pets/2', data=None, content_type='application/json')
         self.assertEqual( resp.status_code, status.HTTP_400_BAD_REQUEST )
 
+    def test_update_pet_with_text_data(self):
+        resp = self.app.put('/pets/2', data="hello", content_type='text/plain')
+        self.assertEqual( resp.status_code, status.HTTP_400_BAD_REQUEST )
+
     def test_update_pet_with_no_name(self):
         new_pet = {'category': 'dog'}
         data = json.dumps(new_pet)
