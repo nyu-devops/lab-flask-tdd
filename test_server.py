@@ -13,13 +13,20 @@ import server
 ######################################################################
 class TestPetServer(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         # Only log criticl errors
         server.app.debug = True
         server.app.logger.addHandler(logging.StreamHandler())
         server.app.logger.setLevel(logging.CRITICAL)
         # Set up the test database
         server.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/test.db'
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
+    def setUp(self):
         server.db.drop_all()    # clean up the last tests
         server.db.create_all()  # make our sqlalchemy tables
         server.db.session.add(server.Pet(name='fido', category='dog'))
