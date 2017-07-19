@@ -130,7 +130,7 @@ class TestPetServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_400_BAD_REQUEST )
 
     def test_create_pet_with_no_content_type(self):
-        new_pet = {'category': 'dog'}
+        new_pet = {'name': 'fifi', 'category': 'dog'}
         data = json.dumps(new_pet)
         resp = self.app.post('/pets', data=data)
         self.assertEqual( resp.status_code, status.HTTP_400_BAD_REQUEST )
