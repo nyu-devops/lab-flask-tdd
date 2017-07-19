@@ -1,6 +1,7 @@
 # Test cases can be run with either of the following:
 # python -m unittest discover
 # nosetests -v --rednose --nologcapture
+# flake8 server.py --count --max-line-length=127 --statistics --exit-zero
 
 import unittest
 import logging
