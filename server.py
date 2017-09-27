@@ -139,11 +139,9 @@ def create_pets():
     Creates a Pet
     This endpoint will create a Pet based the data in the body that is posted
     """
-    app.logger.info('Create a Pet...')
     pet = Pet()
     pet.deserialize(request.get_json())
     pet.save()
-    app.logger.info('Pet [%s] saved!', pet.id)
     message = pet.serialize()
     location_url = url_for('get_pets', pet_id=pet.id, _external=True)
     return make_response(jsonify(message), 201,
