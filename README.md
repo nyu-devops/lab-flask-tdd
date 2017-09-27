@@ -33,16 +33,13 @@ Then all you have to do is clone this repo and invoke vagrant:
 
     git clone https://github.com/nyu-devops/ab-flask-tdd.git
     cd lab-flask-tdd
-    vagrant up && vagrant ssh
+    vagrant up
+    vagrant ssh
     cd /vagrant
 
 You can now run `nosetests` to run the tests.
 
 ## Manually running the Tests
-
-Run the tests using `unittest`
-
-    $ python -m unittest discover
 
 Run the tests using `nose`
 

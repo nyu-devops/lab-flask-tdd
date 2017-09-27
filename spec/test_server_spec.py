@@ -13,6 +13,7 @@
 # TRY:
 # nosetests --with-spec --spec-color --with-noy spec
 
+import logging
 import json
 import server
 from expects import *
@@ -22,19 +23,15 @@ describe "Test Pet Server":
 
     before_each:
         # Only log criticl errors
-        server.app.debug = True
-        # Set up the test database
-        server.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/test.db'
-        server.db.drop_all()    # clean up the last tests
-        server.db.create_all()  # make our sqlalchemy tables
-        server.db.session.add(server.Pet(name='fido', category='dog'))
-        server.db.session.add(server.Pet(name='kitty', category='cat'))
-        server.db.session.commit()
+        server.app.debug = False
+        server.initialize_logging(logging.ERROR)
+        server.Pet.remove_all()
+        server.Pet(0, 'fido', 'dog').save()
+        server.Pet(0, 'kitty', 'cat').save()
         self.app = server.app.test_client()
 
     after_each:
-        server.db.session.remove()
-        server.db.drop_all()
+        server.Pet.remove_all()
 
     it "should response to index page":
         resp = self.app.get('/')

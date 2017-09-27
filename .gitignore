@@ -1,10 +1,6 @@
 # Local environment
-.env
 .DS_Store
 Thumbs.db
-
-# Virtual Environment files
-venv/
 
 # Vagrant
 .vagrant
