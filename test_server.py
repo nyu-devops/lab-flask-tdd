@@ -16,10 +16,14 @@ import server
 class TestPetServer(unittest.TestCase):
     """ Pet Server Tests """
 
-    def setUp(self):
-        """ Runs before each test """
+    @classmethod
+    def setUpClass(cls):
+        """ Run once before all tests """
         server.app.debug = False
         server.initialize_logging(logging.ERROR)
+
+    def setUp(self):
+        """ Runs before each test """
         server.Pet.remove_all()
         server.Pet(0, 'fido', 'dog').save()
         server.Pet(0, 'kitty', 'cat').save()
@@ -72,7 +76,6 @@ class TestPetServer(unittest.TestCase):
         self.assertEqual(new_json['name'], 'sammy')
         # check that count has gone up and includes sammy
         resp = self.app.get('/pets')
-        # print 'resp_data(2): ' + resp.data
         data = json.loads(resp.data)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(data), pet_count + 1)
@@ -142,7 +145,6 @@ class TestPetServer(unittest.TestCase):
         resp = self.app.get('/pets', query_string='name=fido')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertTrue(len(resp.data) > 0)
-        print resp.data
         self.assertTrue('fido' in resp.data)
         self.assertFalse('kitty' in resp.data)
         data = json.loads(resp.data)
