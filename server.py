@@ -91,8 +91,8 @@ def index():
     """ Root URL response """
     return jsonify(name='Pet Demo REST API Service',
                    version='1.0',
-                   url=url_for('list_pets', _external=True)
-                  ), 200
+                   paths=url_for('list_pets', _external=True)
+                  ), status.HTTP_200_OK
 
 ######################################################################
 # LIST ALL PETS
@@ -111,7 +111,7 @@ def list_pets():
         pets = Pet.all()
 
     results = [pet.serialize() for pet in pets]
-    return make_response(jsonify(results), 200)
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 
 ######################################################################
@@ -127,7 +127,7 @@ def get_pets(pet_id):
     pet = Pet.find(pet_id)
     if not pet:
         raise NotFound("Pet with id '{}' was not found.".format(pet_id))
-    return make_response(jsonify(pet.serialize()), 200)
+    return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
 
 
 ######################################################################
@@ -144,7 +144,7 @@ def create_pets():
     pet.save()
     message = pet.serialize()
     location_url = url_for('get_pets', pet_id=pet.id, _external=True)
-    return make_response(jsonify(message), 201,
+    return make_response(jsonify(message), status.HTTP_201_CREATED,
                          {
                              'Location': location_url
                          })
@@ -166,7 +166,7 @@ def update_pets(pet_id):
     pet.deserialize(request.get_json())
     pet.id = pet_id
     pet.save()
-    return make_response(jsonify(pet.serialize()), 200)
+    return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
 
 
 ######################################################################
@@ -182,7 +182,7 @@ def delete_pets(pet_id):
     pet = Pet.find(pet_id)
     if pet:
         pet.delete()
-    return make_response('', 204)
+    return make_response('', status.HTTP_204_NO_CONTENT)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
