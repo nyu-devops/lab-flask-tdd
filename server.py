@@ -30,7 +30,7 @@ import logging
 from flask import Flask, jsonify, request, url_for, make_response
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
-from models import Pet
+from models import Pet, DataValidationError
 
 # Create Flask application
 app = Flask(__name__)
@@ -42,7 +42,7 @@ PORT = os.getenv('PORT', '5000')
 ######################################################################
 # Error Handlers
 ######################################################################
-@app.errorhandler(ValueError)
+@app.errorhandler(DataValidationError)
 def request_validation_error(error):
     """ Handles Value Errors from bad data """
     return bad_request(error)

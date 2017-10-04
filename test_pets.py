@@ -5,7 +5,7 @@
 """ Test cases for Pet Model """
 
 import unittest
-from models import Pet
+from models import Pet, DataValidationError
 
 ######################################################################
 #  T E S T   C A S E S
@@ -87,17 +87,17 @@ class TestPets(unittest.TestCase):
         """ Deserialize a Pet without a name """
         pet = Pet()
         data = {"id":0, "category": "cat"}
-        self.assertRaises(ValueError, pet.deserialize, data)
+        self.assertRaises(DataValidationError, pet.deserialize, data)
 
     def test_deserialize_with_no_data(self):
         """ Deserialize a Pet with no data """
         pet = Pet()
-        self.assertRaises(ValueError, pet.deserialize, None)
+        self.assertRaises(DataValidationError, pet.deserialize, None)
 
     def test_deserialize_with_bad_data(self):
         """ Deserailize a Pet with bad data """
         pet = Pet()
-        self.assertRaises(ValueError, pet.deserialize, "data")
+        self.assertRaises(DataValidationError, pet.deserialize, "data")
 
     def test_find_pet(self):
         """ Find a Pet by ID """
@@ -129,7 +129,7 @@ class TestPets(unittest.TestCase):
         self.assertEqual(pets[0].name, "kitty")
 
     def test_find_by_name(self):
-        """ Find a Per by Name """
+        """ Find a Pet by Name """
         Pet(0, "fido", "dog").save()
         Pet(0, "kitty", "cat").save()
         pets = Pet.find_by_name("kitty")
