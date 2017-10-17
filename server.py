@@ -194,7 +194,7 @@ def check_content_type(content_type):
     """ Checks that the media type is correct """
     if request.headers['Content-Type'] == content_type:
         return
-    app.logger.error('Content-Type must be %s', content_type)
+    app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
     abort(415, 'Content-Type must be {}'.format(content_type))
 
 def initialize_logging(log_level):
