@@ -27,7 +27,7 @@ DELETE /pets/{id} - deletes a Pet record in the database
 import os
 import sys
 import logging
-from flask import Flask, jsonify, request, url_for, make_response
+from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 from models import Pet, DataValidationError
@@ -139,6 +139,7 @@ def create_pets():
     Creates a Pet
     This endpoint will create a Pet based the data in the body that is posted
     """
+    check_content_type('application/json')
     pet = Pet()
     pet.deserialize(request.get_json())
     pet.save()
@@ -160,6 +161,7 @@ def update_pets(pet_id):
 
     This endpoint will update a Pet based the body that is posted
     """
+    check_content_type('application/json')
     pet = Pet.find(pet_id)
     if not pet:
         raise NotFound("Pet with id '{}' was not found.".format(pet_id))
@@ -187,6 +189,13 @@ def delete_pets(pet_id):
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
+
+def check_content_type(content_type):
+    """ Checks that the media type is correct """
+    if request.headers['Content-Type'] == content_type:
+        return
+    app.logger.error('Content-Type must be %s', content_type)
+    abort(415, 'Content-Type must be {}'.format(content_type))
 
 def initialize_logging(log_level):
     """ Initialized the default logging to STDOUT """

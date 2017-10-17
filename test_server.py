@@ -9,6 +9,7 @@ import unittest
 import json
 from mock import MagicMock, patch
 from flask_api import status    # HTTP Status Codes
+from models import DataValidationError
 import server
 
 ######################################################################
@@ -125,6 +126,13 @@ class TestPetServer(unittest.TestCase):
         resp = self.app.post('/pets', data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_with_wrong_type(self):
+        """ Create a Pet with wrong Content-Type """
+        new_pet = {'name': 'garfield', 'category': 'cat'}
+        data = json.dumps(new_pet)
+        resp = self.app.post('/pets', data=data, content_type='application/text')
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
     def test_get_nonexisting_pet(self):
         """ Get a Pet that doesn't exist """
         resp = self.app.get('/pets/5')
@@ -152,24 +160,24 @@ class TestPetServer(unittest.TestCase):
         query_item = data[0]
         self.assertEqual(query_item['name'], 'fido')
 
-    # def test_method_not_allowed(self):
-    #     """ Call a Method thats not Allowed """
-    #     resp = self.app.post('/pets/0')
-    #     self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+    def test_method_not_allowed(self):
+        """ Call a Method thats not Allowed """
+        resp = self.app.post('/pets/0')
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    # @patch('server.Pet.find_by_name')
-    # def test_bad_request(self, bad_request_mock):
-    #     """ Test a Bad Request error from Find By Name """
-    #     bad_request_mock.side_effect = ValueError()
-    #     resp = self.app.get('/pets', query_string='name=fido')
-    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+    @patch('server.Pet.find_by_name')
+    def test_bad_request(self, bad_request_mock):
+        """ Test a Bad Request error from Find By Name """
+        bad_request_mock.side_effect = DataValidationError()
+        resp = self.app.get('/pets', query_string='name=fido')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # @patch('server.Pet.find_by_name')
-    # def test_mock_search_data(self, pet_find_mock):
-    #     """ Test showing how to mock data """
-    #     pet_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'fido'})]
-    #     resp = self.app.get('/pets', query_string='name=fido')
-    #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
+    @patch('server.Pet.find_by_name')
+    def test_mock_search_data(self, pet_find_mock):
+        """ Test showing how to mock data """
+        pet_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'fido'})]
+        resp = self.app.get('/pets', query_string='name=fido')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
 
 ######################################################################
