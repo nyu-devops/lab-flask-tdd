@@ -60,6 +60,10 @@ You can even run `nosetests` with `coverage`
 
 Try and get as close to 100% coverage as you can.
 
+It's also a good idea to make sure that your Python code follows the PEP8 standard. `flake8` has been included in the `requirements.txt` file so that you can check if your code is compliant like this:
+
+    $ flake8 --count --max-complexity=10 --statistics model,server
+
 When you are done, you can exit and shut down the vm with:
 
     $ exit
@@ -79,4 +83,3 @@ If the VM is no longer needed you can remove it with:
     * ./spec/test_server_spec.py -- test specs using noseOfYeti
 
 This repo is part of the DevOps course at NYU.
-
