@@ -1,9 +1,6 @@
 # lab-flask-tdd
 
-[![Build Status](https://travis-ci.org/rofrano/lab-flask-tdd.svg?branch=master)](https://travis-ci.org/rofrano/lab-flask-tdd)
-[![Codecov](https://img.shields.io/codecov/c/github/rofrano/lab-flask-tdd.svg)]()
-
-NYU DevOps lab on Test Driven Development
+DevOps lab on Test Driven Development with Python Flask
 
 ## Introduction
 
@@ -31,7 +28,7 @@ Download [Vagrant](https://www.vagrantup.com/)
 
 Then all you have to do is clone this repo and invoke vagrant:
 
-    git clone https://github.com/nyu-devops/ab-flask-tdd.git
+    git clone git@github.ibm.com:DevOpsResearch/lab-flask-tdd.git
     cd lab-flask-tdd
     vagrant up
     vagrant ssh
@@ -73,7 +70,9 @@ If the VM is no longer needed you can remove it with:
 ## What's featured in the project?
 
     * server.py -- the main Service using Python Flask
-    * test_server.py -- test cases using unittest
+    * models.py -- the data models
+    * test_server.py -- test cases against the server
+    * test_pets.py -- test cases against the model
     * ./spec/test_server_spec.py -- test specs using noseOfYeti
 
-This repo is part of the DevOps course at NYU.
+This repo is part of the DevOps course at IBM Research.

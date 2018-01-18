@@ -197,7 +197,7 @@ def check_content_type(content_type):
     app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
     abort(415, 'Content-Type must be {}'.format(content_type))
 
-def initialize_logging(log_level):
+def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """
     if not app.debug:
         print 'Setting up logging...'
