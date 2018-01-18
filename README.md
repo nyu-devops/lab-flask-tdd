@@ -73,7 +73,9 @@ If the VM is no longer needed you can remove it with:
 ## What's featured in the project?
 
     * server.py -- the main Service using Python Flask
-    * test_server.py -- test cases using unittest
+    * models.py -- the data model
+    * test_server.py -- test cases against the service
+    * test_pets.py -- test cases against the model
     * ./spec/test_server_spec.py -- test specs using noseOfYeti
 
 This repo is part of the DevOps course at NYU.
