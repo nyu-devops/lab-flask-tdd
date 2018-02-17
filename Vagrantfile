@@ -46,11 +46,11 @@ Vagrant.configure(2) do |config|
     apt-get install -y git python-pip python-dev build-essential
     pip install --upgrade pip
     apt-get -y autoremove
+    # Make vi look nice
+    sudo -H -u ubuntu echo "colorscheme desert" > ~/.vimrc
     # Install app dependencies
     cd /vagrant
     sudo pip install -r requirements.txt
-    # Make vi look nice
-    sudo -H -u ubuntu echo "colorscheme desert" > ~/.vimrc
   SHELL
 
 end

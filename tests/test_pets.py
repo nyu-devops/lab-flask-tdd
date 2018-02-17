@@ -1,8 +1,24 @@
-# Test cases can be run with:
-# nosetests
-# coverage report -m
+# Copyright 2016, 2017 John J. Rofrano. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-""" Test cases for Pet Model """
+"""
+Test cases for Pet Model
+
+Test cases can be run with:
+  nosetests
+  coverage report -m
+"""
 
 import unittest
 from models import Pet, DataValidationError
@@ -82,6 +98,14 @@ class TestPets(unittest.TestCase):
         self.assertEqual(pet.id, 1)
         self.assertEqual(pet.name, "kitty")
         self.assertEqual(pet.category, "cat")
+        # test with id passed into constructor
+        pet = Pet(2)
+        pet.deserialize(data)
+        self.assertNotEqual(pet, None)
+        self.assertEqual(pet.id, 2) # id should not change
+        self.assertEqual(pet.name, "kitty")
+        self.assertEqual(pet.category, "cat")
+
 
     def test_deserialize_with_no_name(self):
         """ Deserialize a Pet without a name """

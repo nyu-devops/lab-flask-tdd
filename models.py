@@ -78,7 +78,9 @@ class Pet(object):
         """
         if not isinstance(data, dict):
             raise DataValidationError('Invalid pet: body of request contained bad or no data')
-        if data.has_key('id'):
+        # only update the id if it is zero
+        # this prevents spoofing the id by changing the original id with the data
+        if data.has_key('id') and self.id == 0:
             self.id = data['id']
         try:
             self.name = data['name']
