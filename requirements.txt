@@ -8,9 +8,6 @@ httpie==0.9.9
 nose==1.3.7
 rednose==1.2.1
 pinocchio==0.4.2
-# Rspec DSL
-noseOfYeti==1.6
-expects==0.8.0
 # Code coverage
 coverage==4.2
 codecov==2.0.5
