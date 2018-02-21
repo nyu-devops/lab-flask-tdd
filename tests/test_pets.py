@@ -21,7 +21,11 @@ Test cases can be run with:
 """
 
 import unittest
-from models import Pet, DataValidationError
+import os
+#from models import Pet, DataValidationError
+from server import Pet, DataValidationError, app, db
+
+DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///db/test.db')
 
 ######################################################################
 #  T E S T   C A S E S
@@ -29,24 +33,42 @@ from models import Pet, DataValidationError
 class TestPets(unittest.TestCase):
     """ Test Cases for Pets """
 
+    @classmethod
+    def setUpClass(cls):
+        """ These run once per Test suite """
+        app.debug = False
+        # Set up the test database
+        app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
     def setUp(self):
-        Pet.remove_all()
+        #Pet.init_db()
+        db.drop_all()    # clean up the last tests
+        db.create_all()  # make our sqlalchemy tables
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
 
     def test_create_a_pet(self):
         """ Create a pet and assert that it exists """
-        pet = Pet(0, "fido", "dog")
+        pet = Pet(name="fido", category="dog", available=True)
         self.assertTrue(pet != None)
-        self.assertEqual(pet.id, 0)
+        self.assertEqual(pet.id, None)
         self.assertEqual(pet.name, "fido")
         self.assertEqual(pet.category, "dog")
+        self.assertEqual(pet.available, True)
 
     def test_add_a_pet(self):
         """ Create a pet and add it to the database """
         pets = Pet.all()
         self.assertEqual(pets, [])
-        pet = Pet(0, "fido", "dog")
+        pet = Pet(name="fido", category="dog", available=True)
         self.assertTrue(pet != None)
-        self.assertEqual(pet.id, 0)
+        self.assertEqual(pet.id, None)
         pet.save()
         # Asert that it was assigned an id and shows up in the database
         self.assertEqual(pet.id, 1)
@@ -55,7 +77,7 @@ class TestPets(unittest.TestCase):
 
     def test_update_a_pet(self):
         """ Update a Pet """
-        pet = Pet(0, "fido", "dog")
+        pet = Pet(name="fido", category="dog", available=True)
         pet.save()
         self.assertEqual(pet.id, 1)
         # Change it an save it
@@ -70,7 +92,7 @@ class TestPets(unittest.TestCase):
 
     def test_delete_a_pet(self):
         """ Delete a Pet """
-        pet = Pet(0, "fido", "dog")
+        pet = Pet(name="fido", category="dog", available=True)
         pet.save()
         self.assertEqual(len(Pet.all()), 1)
         # delete the pet and make sure it isn't in the database
@@ -79,38 +101,33 @@ class TestPets(unittest.TestCase):
 
     def test_serialize_a_pet(self):
         """ Test serialization of a Pet """
-        pet = Pet(0, "fido", "dog")
+        pet = Pet(name="fido", category="dog", available=False)
         data = pet.serialize()
         self.assertNotEqual(data, None)
         self.assertIn('id', data)
-        self.assertEqual(data['id'], 0)
+        self.assertEqual(data['id'], None)
         self.assertIn('name', data)
         self.assertEqual(data['name'], "fido")
         self.assertIn('category', data)
         self.assertEqual(data['category'], "dog")
+        self.assertIn('available', data)
+        self.assertEqual(data['available'], False)
 
     def test_deserialize_a_pet(self):
         """ Test deserialization of a Pet """
-        data = {"id": 1, "name": "kitty", "category": "cat"}
+        data = {"id": 1, "name": "kitty", "category": "cat", "available": True}
         pet = Pet()
         pet.deserialize(data)
         self.assertNotEqual(pet, None)
-        self.assertEqual(pet.id, 1)
+        self.assertEqual(pet.id, None)
         self.assertEqual(pet.name, "kitty")
         self.assertEqual(pet.category, "cat")
-        # test with id passed into constructor
-        pet = Pet(2)
-        pet.deserialize(data)
-        self.assertNotEqual(pet, None)
-        self.assertEqual(pet.id, 2) # id should not change
-        self.assertEqual(pet.name, "kitty")
-        self.assertEqual(pet.category, "cat")
-
+        self.assertEqual(pet.available, True)
 
     def test_deserialize_with_no_name(self):
         """ Deserialize a Pet without a name """
         pet = Pet()
-        data = {"id":0, "category": "cat"}
+        data = {"id":0, "category": "cat", "available": True}
         self.assertRaises(DataValidationError, pet.deserialize, data)
 
     def test_deserialize_with_no_data(self):
@@ -125,12 +142,14 @@ class TestPets(unittest.TestCase):
 
     def test_find_pet(self):
         """ Find a Pet by ID """
-        Pet(0, "fido", "dog").save()
-        Pet(0, "kitty", "cat").save()
-        pet = Pet.find(2)
+        Pet(name="fido", category="dog", available=True).save()
+        kitty = Pet(name="kitty", category="cat", available=False)
+        kitty.save()
+        pet = Pet.find(kitty.id)
         self.assertIsNot(pet, None)
-        self.assertEqual(pet.id, 2)
+        self.assertEqual(pet.id, kitty.id)
         self.assertEqual(pet.name, "kitty")
+        self.assertEqual(pet.available, False)
 
     def test_find_with_no_pets(self):
         """ Find a Pet with no Pets """
@@ -139,27 +158,27 @@ class TestPets(unittest.TestCase):
 
     def test_pet_not_found(self):
         """ Test for a Pet that doesn't exist """
-        Pet(0, "fido", "dog").save()
+        Pet(name="fido", category="dog", available=True).save()
         pet = Pet.find(2)
         self.assertIs(pet, None)
 
     def test_find_by_category(self):
         """ Find Pets by Category """
-        Pet(0, "fido", "dog").save()
-        Pet(0, "kitty", "cat").save()
+        Pet(name="fido", category="dog", available=True).save()
+        Pet(name="kitty", category="cat", available=False).save()
         pets = Pet.find_by_category("cat")
-        self.assertNotEqual(len(pets), 0)
         self.assertEqual(pets[0].category, "cat")
         self.assertEqual(pets[0].name, "kitty")
+        self.assertEqual(pets[0].available, False)
 
     def test_find_by_name(self):
         """ Find a Pet by Name """
-        Pet(0, "fido", "dog").save()
-        Pet(0, "kitty", "cat").save()
+        Pet(name="fido", category="dog", available=True).save()
+        Pet(name="kitty", category="cat", available=False).save()
         pets = Pet.find_by_name("kitty")
-        self.assertEqual(len(pets), 1)
         self.assertEqual(pets[0].category, "cat")
         self.assertEqual(pets[0].name, "kitty")
+        self.assertEqual(pets[0].available, False)
 
 
 ######################################################################
@@ -167,5 +186,3 @@ class TestPets(unittest.TestCase):
 ######################################################################
 if __name__ == '__main__':
     unittest.main()
-    # suite = unittest.TestLoader().loadTestsFromTestCase(TestPets)
-    # unittest.TextTestRunner(verbosity=2).run(suite)

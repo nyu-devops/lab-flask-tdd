@@ -1,16 +1,37 @@
-# Test cases can be run with:
-# nosetests
-# coverage report -m
+# Copyright 2016, 2017 John J. Rofrano. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-""" Test cases for the Pet Service """
+"""
+Pet API Service Test Suite
 
-import logging
+Test cases can be run with the following:
+  nosetests -v --with-spec --spec-color
+  coverage report -m
+"""
+
 import unittest
+import os
 import json
-from mock import MagicMock, patch
+import logging
 from flask_api import status    # HTTP Status Codes
-from models import DataValidationError
+from mock import MagicMock, patch
+
+#from models import Pet
 import server
+from server import Pet, DataValidationError, db
+
+DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///db/test.db')
 
 ######################################################################
 #  T E S T   C A S E S
@@ -22,18 +43,26 @@ class TestPetServer(unittest.TestCase):
     def setUpClass(cls):
         """ Run once before all tests """
         server.app.debug = False
-        server.initialize_logging(logging.ERROR)
+        server.initialize_logging(logging.INFO)
+        # Set up the test database
+        server.app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
 
     def setUp(self):
         """ Runs before each test """
-        server.Pet.remove_all()
-        server.Pet(0, 'fido', 'dog').save()
-        server.Pet(0, 'kitty', 'cat').save()
+        server.init_db()
+        db.drop_all()    # clean up the last tests
+        db.create_all()  # create new tables
+        Pet(name='fido', category='dog', available=True).save()
+        Pet(name='kitty', category='cat', available=True).save()
         self.app = server.app.test_client()
 
     def tearDown(self):
-        """ Runs after each test """
-        server.Pet.remove_all()
+        db.session.remove()
+        db.drop_all()
 
     def test_index(self):
         """ Test the Home Page """
@@ -50,11 +79,14 @@ class TestPetServer(unittest.TestCase):
         self.assertEqual(len(data), 2)
 
     def test_get_pet(self):
-        """ Get one Pet """
-        resp = self.app.get('/pets/2')
+        """ Get a single Pet """
+        # get the id of a pet
+        pet = Pet.find_by_name('fido')[0]
+        resp = self.app.get('/pets/{}'.format(pet.id),
+                            content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
-        self.assertEqual(data['name'], 'kitty')
+        self.assertEqual(data['name'], pet.name)
 
     def test_get_pet_not_found(self):
         """ Get a Pet thats not found """
@@ -62,58 +94,60 @@ class TestPetServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_pet(self):
-        """ Create a Pet """
-        # save the current number of pets for later comparrison
+        """ Create a new Pet """
+        # save the current number of pets for later comparison
         pet_count = self.get_pet_count()
         # add a new pet
-        new_pet = {'name': 'sammy', 'category': 'snake'}
+        new_pet = {'name': 'sammy', 'category': 'snake', 'available': 'True'}
         data = json.dumps(new_pet)
         resp = self.app.post('/pets', data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
         location = resp.headers.get('Location', None)
-        self.assertIsNotNone(location)
+        self.assertTrue(location != None)
         # Check the data is correct
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['name'], 'sammy')
         # check that count has gone up and includes sammy
         resp = self.app.get('/pets')
+        # print 'resp_data(2): ' + resp.data
         data = json.loads(resp.data)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(data), pet_count + 1)
         self.assertIn(new_json, data)
 
     def test_update_pet(self):
-        """ Update a Pet """
-        new_kitty = {'name': 'kitty', 'category': 'tabby'}
+        """ Update an existing Pet """
+        pet = Pet.find_by_name('kitty')[0]
+        new_kitty = {'name': 'kitty', 'category': 'tabby', 'available': 'True'}
         data = json.dumps(new_kitty)
-        resp = self.app.put('/pets/2', data=data, content_type='application/json')
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        resp = self.app.get('/pets/2', content_type='application/json')
+        resp = self.app.put('/pets/{}'.format(pet.id), data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['category'], 'tabby')
 
     def test_update_pet_with_no_name(self):
-        """ Update a Pet with no name """
+        """ Update a Pet without a name """
+        pet = Pet.find_by_name('kitty')[0]
         new_pet = {'category': 'dog'}
         data = json.dumps(new_pet)
-        resp = self.app.put('/pets/2', data=data, content_type='application/json')
+        resp = self.app.put('/pets/{}'.format(pet.id), data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_pet_not_found(self):
-        """ Update a Pet that can't be found """
-        new_kitty = {"name": "timothy", "category": "mouse"}
+        """ Update a Pet that doesn't exist """
+        new_kitty = {'name': 'timothy', 'category': 'mouse', 'available': 'True'}
         data = json.dumps(new_kitty)
         resp = self.app.put('/pets/0', data=data, content_type='application/json')
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_pet(self):
-        """ Delete a Pet that exists """
+        """ Delete a Pet """
+        pet = Pet.find_by_name('fido')[0]
         # save the current number of pets for later comparrison
         pet_count = self.get_pet_count()
-        # delete a pet
-        resp = self.app.delete('/pets/2', content_type='application/json')
+        resp = self.app.delete('/pets/{}'.format(pet.id),
+                               content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         new_count = self.get_pet_count()
@@ -121,49 +155,28 @@ class TestPetServer(unittest.TestCase):
 
     def test_create_pet_with_no_name(self):
         """ Create a Pet with the name missing """
-        new_pet = {'category': 'dog'}
+        new_pet = {'category': 'dog', 'available': 'True'}
         data = json.dumps(new_pet)
         resp = self.app.post('/pets', data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_with_wrong_type(self):
         """ Create a Pet with wrong Content-Type """
-        new_pet = {'name': 'garfield', 'category': 'cat'}
+        new_pet = {'name': 'garfield', 'category': 'cat', 'available': 'True'}
         data = json.dumps(new_pet)
         resp = self.app.post('/pets', data=data, content_type='application/text')
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-    def test_get_nonexisting_pet(self):
-        """ Get a Pet that doesn't exist """
-        resp = self.app.get('/pets/5')
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_query_pet_list_by_category(self):
         """ Query Pets by Category """
         resp = self.app.get('/pets', query_string='category=dog')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(resp.data) > 0)
-        self.assertTrue('fido' in resp.data)
-        self.assertFalse('kitty' in resp.data)
+        self.assertGreater(len(resp.data), 0)
+        self.assertIn('fido', resp.data)
+        self.assertNotIn('kitty', resp.data)
         data = json.loads(resp.data)
         query_item = data[0]
         self.assertEqual(query_item['category'], 'dog')
-
-    def test_query_pet_list_by_name(self):
-        """ Query Pets by Name """
-        resp = self.app.get('/pets', query_string='name=fido')
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(resp.data) > 0)
-        self.assertTrue('fido' in resp.data)
-        self.assertFalse('kitty' in resp.data)
-        data = json.loads(resp.data)
-        query_item = data[0]
-        self.assertEqual(query_item['name'], 'fido')
-
-    def test_method_not_allowed(self):
-        """ Call a Method thats not Allowed """
-        resp = self.app.post('/pets/0')
-        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @patch('server.Pet.find_by_name')
     def test_bad_request(self, bad_request_mock):

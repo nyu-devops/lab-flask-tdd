@@ -24,50 +24,62 @@ Attributes:
 -----------
 name (string) - the name of the pet
 category (string) - the category the pet belongs to (i.e., dog, cat)
+available (boolean) - True for pets that are available for adoption
 
 """
-import threading
+import os
+import json
+import logging
+from flask_sqlalchemy import SQLAlchemy
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
     pass
 
-class Pet(object):
+class Pet(db.Model):
     """
     Class that represents a Pet
 
-    This version uses an in-memory collection of pets for testing
+    This version uses arelational database for persistence
     """
-    lock = threading.Lock()
-    data = []
-    index = 0
+    logger = logging.getLogger(__name__)
+    Pet._db = None
 
-    def __init__(self, id=0, name='', category=''):
-        """ Initialize a Pet """
-        self.id = id
-        self.name = name
-        self.category = category
+    # Table Schema
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(63))
+    category = db.Column(db.String(63))
+    available = db.Column(db.Boolean())
+
+    # def __init__(self, id=0, name='', category=''):
+    #     """ Initialize a Pet """
+    #     self.id = id
+    #     self.name = name
+    #     self.category = category
+
+
+    def __repr__(self):
+        return '<Pet %r>' % (self.name)
 
     def save(self):
         """
         Saves a Pet to the data store
         """
-        if self.id == 0:
-            self.id = self.__next_index()
-            Pet.data.append(self)
-        else:
-            for i in range(len(Pet.data)):
-                if Pet.data[i].id == self.id:
-                    Pet.data[i] = self
-                    break
+        if not self.id:
+            Pet._db.session.add(self)
+        Pet._db.session.commit()
 
     def delete(self):
         """ Removes a Pet from the data store """
-        Pet.data.remove(self)
+        Pet._db.session.delete(self)
+        Pet._db.session.commit()
 
     def serialize(self):
         """ Serializes a Pet into a dictionary """
-        return {"id": self.id, "name": self.name, "category": self.category}
+        return {"id": self.id,
+                "name": self.name,
+                "category": self.category,
+                "available": self.available}
 
     def deserialize(self, data):
         """
@@ -78,54 +90,41 @@ class Pet(object):
         """
         if not isinstance(data, dict):
             raise DataValidationError('Invalid pet: body of request contained bad or no data')
-        # only update the id if it is zero
-        # this prevents spoofing the id by changing the original id with the data
-        if data.has_key('id') and self.id == 0:
-            self.id = data['id']
         try:
             self.name = data['name']
             self.category = data['category']
-        except KeyError as err:
-            raise DataValidationError('Invalid pet: missing ' + err.args[0])
-        return
+            self.available = data['available']
+        except KeyError as error:
+            raise DataValidationError('Invalid pet: missing ' + error.args[0])
+        except TypeError as error:
+            raise DataValidationError('Invalid pet: body of request contained' \
+                                      'bad or no data')
+        return self
 
     @staticmethod
-    def __next_index():
-        """ Generates the next index in a continual sequence """
-        with Pet.lock:
-            Pet.index += 1
-        return Pet.index
+    def init_db(app_db):
+        """ Initializes the database session """
+        Pet._db = app_db
+        Pet.logger.info('Initializing database')
+        Pet._db.create_all()  # make our sqlalchemy tables
 
     @staticmethod
     def all():
         """ Returns all of the Pets in the database """
-        return [pet for pet in Pet.data]
-
-    @staticmethod
-    def remove_all():
-        """ Removes all of the Pets from the database """
-        del Pet.data[:]
-        Pet.index = 0
-        return Pet.data
+        Pet.logger.info('Processing all Pets')
+        return Pet.query.all()
 
     @staticmethod
     def find(pet_id):
         """ Finds a Pet by it's ID """
-        if not Pet.data:
-            return None
-        pets = [pet for pet in Pet.data if pet.id == pet_id]
-        if pets:
-            return pets[0]
-        return None
+        Pet.logger.info('Processing lookup for id %s ...', pet_id)
+        return Pet.query.get(pet_id)
 
     @staticmethod
-    def find_by_category(category):
-        """ Returns all of the Pets in a category
-
-        Args:
-            category (string): the category of the Pets you want to match
-        """
-        return [pet for pet in Pet.data if pet.category == category]
+    def find_or_404(pet_id):
+        """ Find a Pet by it's id """
+        Pet.logger.info('Processing lookup or 404 for id %s ...', pet_id)
+        return Pet.query.get_or_404(pet_id)
 
     @staticmethod
     def find_by_name(name):
@@ -134,4 +133,26 @@ class Pet(object):
         Args:
             name (string): the name of the Pets you want to match
         """
-        return [pet for pet in Pet.data if pet.name == name]
+        Pet.logger.info('Processing name query for %s ...', name)
+        return Pet.query.filter(Pet.name == name)
+
+    @staticmethod
+    def find_by_category(category):
+        """ Returns all of the Pets in a category
+
+        Args:
+            category (string): the category of the Pets you want to match
+        """
+        Pet.logger.info('Processing category query for %s ...', category)
+        return Pet.query.filter(Pet.category == category)
+
+    @staticmethod
+    def find_by_availability(available=True):
+        """ Query that finds Pets by their availability """
+        """ Returns all Pets by their availability
+
+        Args:
+            available (boolean): True for pets that are available
+        """
+        Pet.logger.info('Processing available query for %s ...', available)
+        return Pet.query.filter(Pet.available == available)
