@@ -53,13 +53,6 @@ class Pet(db.Model):
     category = db.Column(db.String(63))
     available = db.Column(db.Boolean())
 
-    # def __init__(self, id=0, name='', category=''):
-    #     """ Initialize a Pet """
-    #     self.id = id
-    #     self.name = name
-    #     self.category = category
-
-
     def __repr__(self):
         return '<Pet %r>' % (self.name)
 
