@@ -27,10 +27,11 @@ category (string) - the category the pet belongs to (i.e., dog, cat)
 available (boolean) - True for pets that are available for adoption
 
 """
-import os
-import json
 import logging
 from flask_sqlalchemy import SQLAlchemy
+
+# Create the SQLAlchemy object to be initialized later in init_db()
+db = SQLAlchemy()
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
@@ -40,10 +41,11 @@ class Pet(db.Model):
     """
     Class that represents a Pet
 
-    This version uses arelational database for persistence
+    This version uses a relational database for persistence which is hidden
+    from us by SQLAlchemy's object relational mappings (ORM)
     """
     logger = logging.getLogger(__name__)
-    Pet._db = None
+    app = None
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
@@ -66,13 +68,13 @@ class Pet(db.Model):
         Saves a Pet to the data store
         """
         if not self.id:
-            Pet._db.session.add(self)
-        Pet._db.session.commit()
+            db.session.add(self)
+        db.session.commit()
 
     def delete(self):
         """ Removes a Pet from the data store """
-        Pet._db.session.delete(self)
-        Pet._db.session.commit()
+        db.session.delete(self)
+        db.session.commit()
 
     def serialize(self):
         """ Serializes a Pet into a dictionary """
@@ -102,11 +104,14 @@ class Pet(db.Model):
         return self
 
     @staticmethod
-    def init_db(app_db):
+    def init_db(app):
         """ Initializes the database session """
-        Pet._db = app_db
         Pet.logger.info('Initializing database')
-        Pet._db.create_all()  # make our sqlalchemy tables
+        Pet.app = app
+        # This is where we initialize SQLAlchemy from the Flask app
+        db.init_app(app)
+        app.app_context().push()
+        db.create_all()  # make our sqlalchemy tables
 
     @staticmethod
     def all():

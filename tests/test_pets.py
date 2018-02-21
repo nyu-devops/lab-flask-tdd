@@ -22,8 +22,8 @@ Test cases can be run with:
 
 import unittest
 import os
-#from models import Pet, DataValidationError
-from server import Pet, DataValidationError, app, db
+from models import Pet, DataValidationError, db
+from server import app
 
 DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///db/test.db')
 
@@ -45,7 +45,7 @@ class TestPets(unittest.TestCase):
         pass
 
     def setUp(self):
-        #Pet.init_db()
+        Pet.init_db(app)
         db.drop_all()    # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
 
@@ -124,22 +124,6 @@ class TestPets(unittest.TestCase):
         self.assertEqual(pet.category, "cat")
         self.assertEqual(pet.available, True)
 
-    def test_deserialize_with_no_name(self):
-        """ Deserialize a Pet without a name """
-        pet = Pet()
-        data = {"id":0, "category": "cat", "available": True}
-        self.assertRaises(DataValidationError, pet.deserialize, data)
-
-    def test_deserialize_with_no_data(self):
-        """ Deserialize a Pet with no data """
-        pet = Pet()
-        self.assertRaises(DataValidationError, pet.deserialize, None)
-
-    def test_deserialize_with_bad_data(self):
-        """ Deserailize a Pet with bad data """
-        pet = Pet()
-        self.assertRaises(DataValidationError, pet.deserialize, "data")
-
     def test_find_pet(self):
         """ Find a Pet by ID """
         Pet(name="fido", category="dog", available=True).save()
@@ -150,17 +134,6 @@ class TestPets(unittest.TestCase):
         self.assertEqual(pet.id, kitty.id)
         self.assertEqual(pet.name, "kitty")
         self.assertEqual(pet.available, False)
-
-    def test_find_with_no_pets(self):
-        """ Find a Pet with no Pets """
-        pet = Pet.find(1)
-        self.assertIs(pet, None)
-
-    def test_pet_not_found(self):
-        """ Test for a Pet that doesn't exist """
-        Pet(name="fido", category="dog", available=True).save()
-        pet = Pet.find(2)
-        self.assertIs(pet, None)
 
     def test_find_by_category(self):
         """ Find Pets by Category """
