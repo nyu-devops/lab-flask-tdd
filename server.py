@@ -245,5 +245,5 @@ if __name__ == "__main__":
     print " P E T   S E R V I C E   S T A R T I N G"
     print "========================================="
     initialize_logging(logging.INFO)
-    db.create_all()  # make our sqlalchemy tables
+    init_db()  # make our sqlalchemy tables
     app.run(host='0.0.0.0', port=int(PORT), debug=DEBUG)
