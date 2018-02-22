@@ -31,7 +31,11 @@ Vagrant.configure(2) do |config|
   if File.exists?(File.expand_path("~/.ssh/id_rsa"))
     config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
   end
-
+  
+  # Change the permission of files and directories
+  # so that nosetests runs without extra arguments.
+  config.vm.synced_folder ".", "/vagrant", mount_options: ["dmode=775,fmode=664"]
+  
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
