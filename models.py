@@ -83,8 +83,6 @@ class Pet(db.Model):
         Args:
             data (dict): A dictionary containing the Pet data
         """
-        if not isinstance(data, dict):
-            raise DataValidationError('Invalid pet: body of request contained bad or no data')
         try:
             self.name = data['name']
             self.category = data['category']

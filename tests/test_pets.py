@@ -124,6 +124,12 @@ class TestPets(unittest.TestCase):
         self.assertEqual(pet.category, "cat")
         self.assertEqual(pet.available, True)
 
+    def test_deserialize_bad_data(self):
+        """ Test deserialization of bad data """
+        data = "this is not a dictionary"
+        pet = Pet()
+        self.assertRaises(DataValidationError, pet.deserialize, data)
+
     def test_find_pet(self):
         """ Find a Pet by ID """
         Pet(name="fido", category="dog", available=True).save()
