@@ -97,9 +97,11 @@ class TestPetServer(unittest.TestCase):
         # save the current number of pets for later comparison
         pet_count = self.get_pet_count()
         # add a new pet
-        new_pet = {'name': 'sammy', 'category': 'snake', 'available': 'True'}
+        new_pet = dict(name='sammy', category='snake', available=True)
         data = json.dumps(new_pet)
-        resp = self.app.post('/pets', data=data, content_type='application/json')
+        resp = self.app.post('/pets',
+                             data=data,
+                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
         location = resp.headers.get('Location', None)
@@ -118,9 +120,11 @@ class TestPetServer(unittest.TestCase):
     def test_update_pet(self):
         """ Update an existing Pet """
         pet = Pet.find_by_name('kitty')[0]
-        new_kitty = {'name': 'kitty', 'category': 'tabby', 'available': 'True'}
+        new_kitty = dict(name='kitty', category='tabby', available=True)
         data = json.dumps(new_kitty)
-        resp = self.app.put('/pets/{}'.format(pet.id), data=data, content_type='application/json')
+        resp = self.app.put('/pets/{}'.format(pet.id),
+                            data=data,
+                            content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['category'], 'tabby')
@@ -139,7 +143,8 @@ class TestPetServer(unittest.TestCase):
 
     def test_query_pet_list_by_category(self):
         """ Query Pets by Category """
-        resp = self.app.get('/pets', query_string='category=dog')
+        resp = self.app.get('/pets',
+                            query_string='category=dog')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertGreater(len(resp.data), 0)
         self.assertIn('fido', resp.data)
