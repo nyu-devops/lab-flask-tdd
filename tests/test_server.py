@@ -18,6 +18,7 @@ Pet API Service Test Suite
 Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
   coverage report -m
+  codecov --token=$CODECOV_TOKEN
 """
 
 import unittest
@@ -28,7 +29,7 @@ from flask_api import status    # HTTP Status Codes
 from mock import MagicMock, patch
 
 from app.models import Pet, DataValidationError, db
-import app.service as server
+import app.service as service
 
 DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 
@@ -41,10 +42,10 @@ class TestPetServer(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """ Run once before all tests """
-        server.app.debug = False
-        server.initialize_logging(logging.INFO)
+        service.app.debug = False
+        service.initialize_logging(logging.INFO)
         # Set up the test database
-        server.app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+        service.app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
     @classmethod
     def tearDownClass(cls):
@@ -52,12 +53,12 @@ class TestPetServer(unittest.TestCase):
 
     def setUp(self):
         """ Runs before each test """
-        server.init_db()
+        service.init_db()
         db.drop_all()    # clean up the last tests
         db.create_all()  # create new tables
         Pet(name='fido', category='dog', available=True).save()
         Pet(name='kitty', category='cat', available=True).save()
-        self.app = server.app.test_client()
+        self.app = service.app.test_client()
 
     def tearDown(self):
         db.session.remove()
@@ -153,14 +154,14 @@ class TestPetServer(unittest.TestCase):
         query_item = data[0]
         self.assertEqual(query_item['category'], 'dog')
 
-    # @patch('server.Pet.find_by_name')
+    # @patch('service.Pet.find_by_name')
     # def test_bad_request(self, bad_request_mock):
     #     """ Test a Bad Request error from Find By Name """
     #     bad_request_mock.side_effect = DataValidationError()
     #     resp = self.app.get('/pets', query_string='name=fido')
     #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
     #
-    # @patch('server.Pet.find_by_name')
+    # @patch('service.Pet.find_by_name')
     # def test_mock_search_data(self, pet_find_mock):
     #     """ Test showing how to mock data """
     #     pet_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'fido'})]

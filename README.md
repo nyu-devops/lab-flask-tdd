@@ -1,7 +1,8 @@
 # lab-flask-tdd
 
-[![Build Status](https://travis-ci.org/rofrano/lab-flask-tdd.svg?branch=master)](https://travis-ci.org/rofrano/lab-flask-tdd)
-[![Codecov](https://img.shields.io/codecov/c/github/rofrano/lab-flask-tdd.svg)]()
+[![Build Status](https://travis-ci.org/nyu-devops/lab-flask-tdd.svg?branch=master)](https://travis-ci.org/nyu-devops/lab-flask-tdd)
+[![Codecov](https://codecov.io/gh/nyu-devops/lab-flask-tdd/branch/master/graph/badge.svg)](https://codecov.io/gh/nyu-devops/lab-flask-tdd/branch/master/graph/badge.svg)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 NYU DevOps lab on Test Driven Development
 
@@ -14,10 +15,10 @@ If it's not worth testing, why are you wasting your time working on it?”_
 
 As Software Engineers we need to have the discipline to ensure that our code works as expected and continues to do so regardless of any changes, refactoring, or the introduction of new functionality.
 
-This lab introduces Test Driven Development using `PyUnit` and `nose` (a.k.a. `nosetests`). It also demonstrates how to create a simple RESTful service using Python Flask and SQLite.
+This lab introduces **Test Driven Development** using `PyUnit` and `nose` (a.k.a. `nosetests`). It also demonstrates how to create a simple RESTful service using Python Flask and SQLite.
 The resource model is persistences using SQLAlchemy to keep the application simple. It's purpose is to show the correct API calls and return codes that should be used for a REST API.
 
-**Note:** The base service code is contained in `server.py` while the business logic for manipulating Pets is in the `models.py` file. This follows the popular Model View Controller (MVC) separation of duities by keeping the model separate from the controller. As such, we have two tests suites: one for the model (`test_pets.py`) and one for the serveice itself (`test_server.py`)
+**Note:** The base service code is contained in `service.py` while the business logic for manipulating Pets is in the `models.py` file. This follows the popular Model View Controller (MVC) separation of duities by keeping the model separate from the controller. As such, we have two tests suites: one for the model (`test_pets.py`) and one for the serveice itself (`test_server.py`)
 
 ## Prerequisite Installation using Vagrant
 
@@ -80,9 +81,9 @@ If the VM is no longer needed you can remove it with:
 
 ## What's featured in the project?
 
-    * server.py -- the main Service using Python Flask
-    * models.py -- the data model using SQLAlchemy
+    * app/service.py -- the main Service using Python Flask
+    * app/models.py -- the data model using SQLAlchemy
     * tests/test_server.py -- test cases against the service
     * tests/test_pets.py -- test cases against the Pet model
 
-This repo is part of the CSCI-GA.3033-013: **DevOps** course at NYU created by John Rofrano.
+This repo is part of the NYU masters class: **CSCI-GA.2820-001 DevOps and Agile Methodologies** created by John Rofrano.
