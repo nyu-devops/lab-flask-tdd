@@ -1,17 +1,24 @@
-Flask==0.12
-Flask-API==0.6.9
-Flask-SQLAlchemy==2.1
-SQLAlchemy==1.1.5
-pylint
-flake8
+# Dependencies
+Flask==1.0.2
+Flask-API==1.0
+Flask-SQLAlchemy==2.3.2
+SQLAlchemy==1.2.12
+
+# Runtime
+gunicorn==19.9.0
+honcho==1.0.1
+
+# Code quality
+pylint==1.9.3
+flake8==3.5.0
 
 # Testing
 mock==2.0.0
 nose==1.3.7
-rednose==1.2.1
 pinocchio==0.4.2
+rednose==1.3.0
 httpie==0.9.9
 
 # Code coverage
-coverage==4.2
-codecov==2.0.5
+coverage==4.5.1
+codecov==2.0.15

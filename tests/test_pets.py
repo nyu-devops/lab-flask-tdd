@@ -22,10 +22,10 @@ Test cases can be run with:
 
 import unittest
 import os
-from models import Pet, DataValidationError, db
-from server import app
+from app.models import Pet, DataValidationError, db
+from app import app
 
-DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///db/test.db')
+DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 
 ######################################################################
 #  T E S T   C A S E S
