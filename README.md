@@ -52,20 +52,15 @@ Nose is also configured to automatically run the `coverage` tool and you should 
 
 This is particularly useful because it reports the line numbers for the code that is not covered so that you can write more test cases to get higher code coverage.
 
-You can also run the Code Coverage tool manually without `nosetests` to see how well your test cases exercise your code:
-
-    $ coverage run test_server.py
-    $ coverage report -m --include=server.py
-
 You can also manually run `nosetests` with `coverage` (but `setup.cfg` does this already)
 
-    $ nosetests --with-coverage --cover-package=server
+    $ nosetests --with-coverage --cover-package=app
 
 Try and get as close to 100% coverage as you can.
 
 It's also a good idea to make sure that your Python code follows the PEP8 standard. `flake8` has been included in the `requirements.txt` file so that you can check if your code is compliant like this:
 
-    $ flake8 --count --max-complexity=10 --statistics model,server
+    $ flake8 --count --max-complexity=10 --statistics model,service
 
 I've also include `pylint` in the requirements. If you use a programmer's editor like Atom.io you can install plug-ins that will use `pylint` while you are editing. This catches a lot of errors while you code that would normally be caught at runtime. It's a good idea to always code with pylint active.
 
