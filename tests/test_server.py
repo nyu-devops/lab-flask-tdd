@@ -27,10 +27,10 @@ import logging
 from flask_api import status    # HTTP Status Codes
 from mock import MagicMock, patch
 
-from models import Pet, DataValidationError, db
-import server
+from app.models import Pet, DataValidationError, db
+import app.service as server
 
-DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///db/test.db')
+DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 
 ######################################################################
 #  T E S T   C A S E S

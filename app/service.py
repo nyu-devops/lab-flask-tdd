@@ -34,24 +34,10 @@ from werkzeug.exceptions import NotFound
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-
 from models import Pet, DataValidationError
 
-# Create Flask application
-app = Flask(__name__)
-
-# We'll just use SQLite here so we don't need an external database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/development.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'please, tell nobody... Shhhh'
-app.config['LOGGING_LEVEL'] = logging.INFO
-
-# Initialize SQLAlchemy
-#db = SQLAlchemy(app)
-
-# Pull options from environment
-DEBUG = (os.getenv('DEBUG', 'False') == 'True')
-PORT = os.getenv('PORT', '5000')
+# Import Flask application
+from . import app
 
 ######################################################################
 # Error Handlers
@@ -235,15 +221,3 @@ def initialize_logging(log_level=logging.INFO):
         app.logger.addHandler(handler)
         app.logger.setLevel(log_level)
         app.logger.info('Logging handler established')
-
-
-######################################################################
-#   M A I N
-######################################################################
-if __name__ == "__main__":
-    print "========================================="
-    print " P E T   S E R V I C E   S T A R T I N G"
-    print "========================================="
-    initialize_logging(logging.INFO)
-    init_db()  # make our sqlalchemy tables
-    app.run(host='0.0.0.0', port=int(PORT), debug=DEBUG)
