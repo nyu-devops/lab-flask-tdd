@@ -32,8 +32,14 @@ Vagrant.configure(2) do |config|
     config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
   end
 
+  # Copy your ~/.vimrc file so that vi looks the same
+  if File.exists?(File.expand_path("~/.vimrc"))
+    config.vm.provision "file", source: "~/.vimrc", destination: "~/.vimrc"
+  end
+
   # Windows users need to change the permission of files and directories
   # so that nosetests runs without extra arguments.
+  # Mac users can comment this next line out
   config.vm.synced_folder ".", "/vagrant", mount_options: ["dmode=775,fmode=664"]
 
   # Enable provisioning with a shell script. Additional provisioners such as
@@ -44,8 +50,6 @@ Vagrant.configure(2) do |config|
     apt-get install -y git python-pip python-dev build-essential
     apt-get -y autoremove
     #pip install --upgrade pip
-    # Make vi look nice
-    sudo -H -u vagrant echo "colorscheme desert" > ~/.vimrc
     # Install app dependencies
     cd /vagrant
     pip install -r requirements.txt
