@@ -23,7 +23,6 @@ Test cases can be run with the following:
 
 import unittest
 import os
-import json
 import logging
 from flask_api import status    # HTTP Status Codes
 from mock import MagicMock, patch
@@ -68,14 +67,14 @@ class TestPetServer(unittest.TestCase):
         """ Test the Home Page """
         resp = self.app.get('/')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.data)
+        data = resp.get_json()
         self.assertEqual(data['name'], 'Pet Demo REST API Service')
 
     def test_get_pet_list(self):
         """ Get a list of Pets """
         resp = self.app.get('/pets')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.data)
+        data = resp.get_json()
         self.assertEqual(len(data), 2)
 
     def test_get_pet(self):
@@ -85,7 +84,7 @@ class TestPetServer(unittest.TestCase):
         resp = self.app.get('/pets/{}'.format(pet.id),
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.data)
+        data = resp.get_json()
         self.assertEqual(data['name'], pet.name)
 
     def test_get_pet_not_found(self):
@@ -99,21 +98,20 @@ class TestPetServer(unittest.TestCase):
         pet_count = self.get_pet_count()
         # add a new pet
         new_pet = dict(name='sammy', category='snake', available=True)
-        data = json.dumps(new_pet)
         resp = self.app.post('/pets',
-                             data=data,
+                             json=new_pet,
                              content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
         location = resp.headers.get('Location', None)
         self.assertTrue(location != None)
         # Check the data is correct
-        new_json = json.loads(resp.data)
+        new_json = resp.get_json()
         self.assertEqual(new_json['name'], 'sammy')
         # check that count has gone up and includes sammy
         resp = self.app.get('/pets')
         # print 'resp_data(2): ' + resp.data
-        data = json.loads(resp.data)
+        data = resp.get_json()
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(data), pet_count + 1)
         self.assertIn(new_json, data)
@@ -122,12 +120,11 @@ class TestPetServer(unittest.TestCase):
         """ Update an existing Pet """
         pet = Pet.find_by_name('kitty')[0]
         new_kitty = dict(name='kitty', category='tabby', available=True)
-        data = json.dumps(new_kitty)
         resp = self.app.put('/pets/{}'.format(pet.id),
-                            data=data,
+                            json=new_kitty,
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        new_json = json.loads(resp.data)
+        new_json = resp.get_json()
         self.assertEqual(new_json['category'], 'tabby')
 
     def test_delete_pet(self):
@@ -150,7 +147,7 @@ class TestPetServer(unittest.TestCase):
         self.assertGreater(len(resp.data), 0)
         self.assertIn('fido', resp.data)
         self.assertNotIn('kitty', resp.data)
-        data = json.loads(resp.data)
+        data = resp.get_json()
         query_item = data[0]
         self.assertEqual(query_item['category'], 'dog')
 
@@ -173,11 +170,21 @@ class TestPetServer(unittest.TestCase):
 # Utility functions
 ######################################################################
 
+    def get_pet(self, name):
+        """ retrieves a pet for use in other actions """
+        resp = self.app.get('/pets',
+                            query_string='name={}'.format(name))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(resp.data), 0)
+        self.assertIn(name, resp.data)
+        data = resp.get_json()
+        return data
+
     def get_pet_count(self):
         """ save the current number of pets """
         resp = self.app.get('/pets')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.data)
+        data = resp.get_json()
         return len(data)
 
 
