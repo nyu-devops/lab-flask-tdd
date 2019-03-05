@@ -25,9 +25,9 @@ import unittest
 import os
 import logging
 from flask_api import status    # HTTP Status Codes
-from mock import MagicMock, patch
-
+#from mock import MagicMock, patch
 from app.models import Pet, DataValidationError, db
+from .pet_factory import PetFactory
 import app.service as service
 
 DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
@@ -55,13 +55,25 @@ class TestPetServer(unittest.TestCase):
         service.init_db()
         db.drop_all()    # clean up the last tests
         db.create_all()  # create new tables
-        Pet(name='fido', category='dog', available=True).save()
-        Pet(name='kitty', category='cat', available=True).save()
         self.app = service.app.test_client()
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+
+    def _create_pets(self, count):
+        """ Factory method to create pets in bulk """
+        pets = []
+        for _ in range(count):
+            test_pet = PetFactory()
+            resp = self.app.post('/pets',
+                                 json=test_pet.serialize(),
+                                 content_type='application/json')
+            self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test pet')
+            new_pet = resp.get_json()
+            test_pet.id = new_pet['id']
+            pets.append(test_pet)
+        return pets
 
     def test_index(self):
         """ Test the Home Page """
@@ -72,20 +84,21 @@ class TestPetServer(unittest.TestCase):
 
     def test_get_pet_list(self):
         """ Get a list of Pets """
+        self._create_pets(5)
         resp = self.app.get('/pets')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
-        self.assertEqual(len(data), 2)
+        self.assertEqual(len(data), 5)
 
     def test_get_pet(self):
         """ Get a single Pet """
         # get the id of a pet
-        pet = Pet.find_by_name('fido')[0]
-        resp = self.app.get('/pets/{}'.format(pet.id),
+        test_pet = self._create_pets(1)[0]
+        resp = self.app.get('/pets/{}'.format(test_pet.id),
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
-        self.assertEqual(data['name'], pet.name)
+        self.assertEqual(data['name'], test_pet.name)
 
     def test_get_pet_not_found(self):
         """ Get a Pet thats not found """
@@ -94,98 +107,86 @@ class TestPetServer(unittest.TestCase):
 
     def test_create_pet(self):
         """ Create a new Pet """
-        # save the current number of pets for later comparison
-        pet_count = self.get_pet_count()
-        # add a new pet
-        new_pet = dict(name='sammy', category='snake', available=True)
+        test_pet = PetFactory()
         resp = self.app.post('/pets',
-                             json=new_pet,
+                             json=test_pet.serialize(),
                              content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
         location = resp.headers.get('Location', None)
         self.assertTrue(location != None)
         # Check the data is correct
-        new_json = resp.get_json()
-        self.assertEqual(new_json['name'], 'sammy')
-        # check that count has gone up and includes sammy
-        resp = self.app.get('/pets')
-        # print 'resp_data(2): ' + resp.data
-        data = resp.get_json()
+        new_pet = resp.get_json()
+        self.assertEqual(new_pet['name'], test_pet.name, "Names do not match")
+        self.assertEqual(new_pet['category'], test_pet.category, "Categories do not match")
+        self.assertEqual(new_pet['available'], test_pet.available, "Availability does not match")
+        # Check that the location header was correct
+        resp = self.app.get(location,
+                            content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(data), pet_count + 1)
-        self.assertIn(new_json, data)
+        new_pet = resp.get_json()
+        self.assertEqual(new_pet['name'], test_pet.name, "Names do not match")
+        self.assertEqual(new_pet['category'], test_pet.category, "Categories do not match")
+        self.assertEqual(new_pet['available'], test_pet.available, "Availability does not match")
 
     def test_update_pet(self):
         """ Update an existing Pet """
-        pet = Pet.find_by_name('kitty')[0]
-        new_kitty = dict(name='kitty', category='tabby', available=True)
-        resp = self.app.put('/pets/{}'.format(pet.id),
-                            json=new_kitty,
+        # create a pet to update
+        test_pet = PetFactory()
+        resp = self.app.post('/pets',
+                             json=test_pet.serialize(),
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the pet
+        new_pet = resp.get_json()
+        new_pet['category'] = 'unknown'
+        resp = self.app.put('/pets/{}'.format(new_pet['id']),
+                            json=new_pet,
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        new_json = resp.get_json()
-        self.assertEqual(new_json['category'], 'tabby')
+        updated_pet = resp.get_json()
+        self.assertEqual(updated_pet['category'], 'unknown')
 
     def test_delete_pet(self):
         """ Delete a Pet """
-        pet = Pet.find_by_name('fido')[0]
-        # save the current number of pets for later comparrison
-        pet_count = self.get_pet_count()
-        resp = self.app.delete('/pets/{}'.format(pet.id),
+        test_pet = self._create_pets(1)[0]
+        resp = self.app.delete('/pets/{}'.format(test_pet.id),
                                content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
-        new_count = self.get_pet_count()
-        self.assertEqual(new_count, pet_count - 1)
+        # make sure they are deleted
+        resp = self.app.get('/pets/{}'.format(test_pet.id),
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_query_pet_list_by_category(self):
         """ Query Pets by Category """
+        pets = self._create_pets(10)
+        test_category = pets[0].category
+        category_pets = [pet for pet in pets if pet.category == test_category]
         resp = self.app.get('/pets',
-                            query_string='category=dog')
+                            query_string='category={}'.format(test_category))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertGreater(len(resp.data), 0)
-        self.assertIn('fido', resp.data)
-        self.assertNotIn('kitty', resp.data)
         data = resp.get_json()
-        query_item = data[0]
-        self.assertEqual(query_item['category'], 'dog')
+        self.assertEqual(len(data), len(category_pets))
+        # check the data just to be sure
+        for pet in data:
+            self.assertEqual(pet['category'], test_category)
 
-    # @patch('service.Pet.find_by_name')
+    # @patch('app.service.Pet.find_by_name')
     # def test_bad_request(self, bad_request_mock):
     #     """ Test a Bad Request error from Find By Name """
     #     bad_request_mock.side_effect = DataValidationError()
     #     resp = self.app.get('/pets', query_string='name=fido')
     #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
     #
-    # @patch('service.Pet.find_by_name')
+    # @patch('app.service.Pet.find_by_name')
     # def test_mock_search_data(self, pet_find_mock):
     #     """ Test showing how to mock data """
     #     pet_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'fido'})]
     #     resp = self.app.get('/pets', query_string='name=fido')
     #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-
-######################################################################
-# Utility functions
-######################################################################
-
-    def get_pet(self, name):
-        """ retrieves a pet for use in other actions """
-        resp = self.app.get('/pets',
-                            query_string='name={}'.format(name))
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertGreater(len(resp.data), 0)
-        self.assertIn(name, resp.data)
-        data = resp.get_json()
-        return data
-
-    def get_pet_count(self):
-        """ save the current number of pets """
-        resp = self.app.get('/pets')
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        return len(data)
 
 
 ######################################################################
