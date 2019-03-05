@@ -94,61 +94,61 @@ class Pet(db.Model):
                                       'bad or no data')
         return self
 
-    @staticmethod
-    def init_db(app):
+    @classmethod
+    def init_db(cls, app):
         """ Initializes the database session """
-        Pet.logger.info('Initializing database')
-        Pet.app = app
+        cls.logger.info('Initializing database')
+        cls.app = app
         # This is where we initialize SQLAlchemy from the Flask app
         db.init_app(app)
         app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
 
-    @staticmethod
-    def all():
+    @classmethod
+    def all(cls):
         """ Returns all of the Pets in the database """
-        Pet.logger.info('Processing all Pets')
-        return Pet.query.all()
+        cls.logger.info('Processing all Pets')
+        return cls.query.all()
 
-    @staticmethod
-    def find(pet_id):
+    @classmethod
+    def find(cls, pet_id):
         """ Finds a Pet by it's ID """
-        Pet.logger.info('Processing lookup for id %s ...', pet_id)
-        return Pet.query.get(pet_id)
+        cls.logger.info('Processing lookup for id %s ...', pet_id)
+        return cls.query.get(pet_id)
 
-    @staticmethod
-    def find_or_404(pet_id):
+    @classmethod
+    def find_or_404(cls, pet_id):
         """ Find a Pet by it's id """
-        Pet.logger.info('Processing lookup or 404 for id %s ...', pet_id)
-        return Pet.query.get_or_404(pet_id)
+        cls.logger.info('Processing lookup or 404 for id %s ...', pet_id)
+        return cls.query.get_or_404(pet_id)
 
-    @staticmethod
-    def find_by_name(name):
+    @classmethod
+    def find_by_name(cls, name):
         """ Returns all Pets with the given name
 
         Args:
             name (string): the name of the Pets you want to match
         """
-        Pet.logger.info('Processing name query for %s ...', name)
-        return Pet.query.filter(Pet.name == name)
+        cls.logger.info('Processing name query for %s ...', name)
+        return cls.query.filter(cls.name == name)
 
-    @staticmethod
-    def find_by_category(category):
+    @classmethod
+    def find_by_category(cls, category):
         """ Returns all of the Pets in a category
 
         Args:
             category (string): the category of the Pets you want to match
         """
-        Pet.logger.info('Processing category query for %s ...', category)
-        return Pet.query.filter(Pet.category == category)
+        cls.logger.info('Processing category query for %s ...', category)
+        return cls.query.filter(cls.category == category)
 
-    @staticmethod
-    def find_by_availability(available=True):
+    @classmethod
+    def find_by_availability(cls, available=True):
         """ Query that finds Pets by their availability """
         """ Returns all Pets by their availability
 
         Args:
             available (boolean): True for pets that are available
         """
-        Pet.logger.info('Processing available query for %s ...', available)
-        return Pet.query.filter(Pet.available == available)
+        cls.logger.info('Processing available query for %s ...', available)
+        return cls.query.filter(cls.available == available)
