@@ -51,7 +51,7 @@ def request_validation_error(error):
 def bad_request(error):
     """ Handles bad reuests with 400_BAD_REQUEST """
     message = error.message or str(error)
-    app.logger.info(message)
+    app.logger.warning(message)
     return jsonify(status=status.HTTP_400_BAD_REQUEST,
                    error='Bad Request',
                    message=message), status.HTTP_400_BAD_REQUEST
@@ -60,7 +60,7 @@ def bad_request(error):
 def not_found(error):
     """ Handles resources not found with 404_NOT_FOUND """
     message = error.message or str(error)
-    app.logger.info(message)
+    app.logger.warning(message)
     return jsonify(status=status.HTTP_404_NOT_FOUND,
                    error='Not Found',
                    message=message), status.HTTP_404_NOT_FOUND
@@ -69,7 +69,7 @@ def not_found(error):
 def method_not_supported(error):
     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
     message = error.message or str(error)
-    app.logger.info(message)
+    app.logger.warning(message)
     return jsonify(status=status.HTTP_405_METHOD_NOT_ALLOWED,
                    error='Method not Allowed',
                    message=message), status.HTTP_405_METHOD_NOT_ALLOWED
@@ -78,7 +78,7 @@ def method_not_supported(error):
 def mediatype_not_supported(error):
     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
     message = error.message or str(error)
-    app.logger.info(message)
+    app.logger.warning(message)
     return jsonify(status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
                    error='Unsupported media type',
                    message=message), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
@@ -87,7 +87,7 @@ def mediatype_not_supported(error):
 def internal_server_error(error):
     """ Handles unexpected server error with 500_SERVER_ERROR """
     message = error.message or str(error)
-    app.logger.info(message)
+    app.logger.error(message)
     return jsonify(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                    error='Internal Server Error',
                    message=message), status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -110,6 +110,7 @@ def index():
 @app.route('/pets', methods=['GET'])
 def list_pets():
     """ Returns all of the Pets """
+    app.logger.info('Request for pet list')
     pets = []
     category = request.args.get('category')
     name = request.args.get('name')
@@ -134,6 +135,7 @@ def get_pets(pet_id):
 
     This endpoint will return a Pet based on it's id
     """
+    app.logger.info('Request for pet with id: %s', pet_id)
     pet = Pet.find(pet_id)
     if not pet:
         raise NotFound("Pet with id '{}' was not found.".format(pet_id))
@@ -149,6 +151,7 @@ def create_pets():
     Creates a Pet
     This endpoint will create a Pet based the data in the body that is posted
     """
+    app.logger.info('Request to create a pet')
     check_content_type('application/json')
     pet = Pet()
     pet.deserialize(request.get_json())
@@ -171,6 +174,7 @@ def update_pets(pet_id):
 
     This endpoint will update a Pet based the body that is posted
     """
+    app.logger.info('Request to update pet with id: %s', pet_id)
     check_content_type('application/json')
     pet = Pet.find(pet_id)
     if not pet:
@@ -191,6 +195,7 @@ def delete_pets(pet_id):
 
     This endpoint will delete a Pet based the id specified in the path
     """
+    app.logger.info('Request to delete pet with id: %s', pet_id)
     pet = Pet.find(pet_id)
     if pet:
         pet.delete()

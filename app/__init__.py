@@ -24,5 +24,8 @@ if __name__ != '__main__':
     if gunicorn_logger:
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
+    else:
+        service.initialize_logging()
+    service.init_db()  # make our sqlalchemy tables
 
 app.logger.info('Logging established')
