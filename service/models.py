@@ -33,9 +33,12 @@ from flask_sqlalchemy import SQLAlchemy
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
+
     pass
+
 
 class Pet(db.Model):
     """
@@ -44,6 +47,7 @@ class Pet(db.Model):
     This version uses a relational database for persistence which is hidden
     from us by SQLAlchemy's object relational mappings (ORM)
     """
+
     logger = logging.getLogger(__name__)
     app = None
 
@@ -54,7 +58,7 @@ class Pet(db.Model):
     available = db.Column(db.Boolean())
 
     def __repr__(self):
-        return '<Pet %r>' % (self.name)
+        return "<Pet %r>" % (self.name)
 
     def save(self):
         """
@@ -71,10 +75,12 @@ class Pet(db.Model):
 
     def serialize(self):
         """ Serializes a Pet into a dictionary """
-        return {"id": self.id,
-                "name": self.name,
-                "category": self.category,
-                "available": self.available}
+        return {
+            "id": self.id,
+            "name": self.name,
+            "category": self.category,
+            "available": self.available,
+        }
 
     def deserialize(self, data):
         """
@@ -84,20 +90,21 @@ class Pet(db.Model):
             data (dict): A dictionary containing the Pet data
         """
         try:
-            self.name = data['name']
-            self.category = data['category']
-            self.available = data['available']
+            self.name = data["name"]
+            self.category = data["category"]
+            self.available = data["available"]
         except KeyError as error:
-            raise DataValidationError('Invalid pet: missing ' + error.args[0])
+            raise DataValidationError("Invalid pet: missing " + error.args[0])
         except TypeError as error:
-            raise DataValidationError('Invalid pet: body of request contained' \
-                                      'bad or no data')
+            raise DataValidationError(
+                "Invalid pet: body of request contained" "bad or no data"
+            )
         return self
 
     @classmethod
     def init_db(cls, app):
         """ Initializes the database session """
-        cls.logger.info('Initializing database')
+        cls.logger.info("Initializing database")
         cls.app = app
         # This is where we initialize SQLAlchemy from the Flask app
         db.init_app(app)
@@ -107,19 +114,19 @@ class Pet(db.Model):
     @classmethod
     def all(cls):
         """ Returns all of the Pets in the database """
-        cls.logger.info('Processing all Pets')
+        cls.logger.info("Processing all Pets")
         return cls.query.all()
 
     @classmethod
     def find(cls, pet_id):
         """ Finds a Pet by it's ID """
-        cls.logger.info('Processing lookup for id %s ...', pet_id)
+        cls.logger.info("Processing lookup for id %s ...", pet_id)
         return cls.query.get(pet_id)
 
     @classmethod
     def find_or_404(cls, pet_id):
         """ Find a Pet by it's id """
-        cls.logger.info('Processing lookup or 404 for id %s ...', pet_id)
+        cls.logger.info("Processing lookup or 404 for id %s ...", pet_id)
         return cls.query.get_or_404(pet_id)
 
     @classmethod
@@ -129,7 +136,7 @@ class Pet(db.Model):
         Args:
             name (string): the name of the Pets you want to match
         """
-        cls.logger.info('Processing name query for %s ...', name)
+        cls.logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
 
     @classmethod
@@ -139,7 +146,7 @@ class Pet(db.Model):
         Args:
             category (string): the category of the Pets you want to match
         """
-        cls.logger.info('Processing category query for %s ...', category)
+        cls.logger.info("Processing category query for %s ...", category)
         return cls.query.filter(cls.category == category)
 
     @classmethod
@@ -150,5 +157,5 @@ class Pet(db.Model):
         Args:
             available (boolean): True for pets that are available
         """
-        cls.logger.info('Processing available query for %s ...', available)
+        cls.logger.info("Processing available query for %s ...", available)
         return cls.query.filter(cls.available == available)

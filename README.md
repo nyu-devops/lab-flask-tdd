@@ -30,49 +30,72 @@ Download [Vagrant](https://www.vagrantup.com/)
 
 Then all you have to do is clone this repo and invoke vagrant:
 
+```shell
     git clone https://github.com/nyu-devops/lab-flask-tdd.git
     cd lab-flask-tdd
     vagrant up
     vagrant ssh
     cd /vagrant
+```
 
 You can now run `nosetests` to run the tests. As developers we always want to run the tests before we change any code so that we know if we brike the code or perhaps someone before us did? Always run the test cases first!
+
+## Runnung the service
+
+The project uses *honcho* which gets it's commands from the `Procfile`. To start the service simply use:
+
+```shell
+    $ honcho start
+```
+
+You should be able to reach the service at: http://localhost:5000
 
 ## Manually running the Tests
 
 Run the tests using `nose`
 
+```shell
     $ nosetests
+```
 
 Nose is configured via the included `setup.cfg` file to automatically include the flags `--with-spec --spec-color` so that red-green-refactor is meaningful. If you are in a command shell that supports colors, passing tests will be green while failing tests will be red.
 
 Nose is also configured to automatically run the `coverage` tool and you should see a percentage of coverage report at the end of your tests. If you want to see what lines of code were not tested use:
 
+```shell
     $ coverage report -m
+```
 
 This is particularly useful because it reports the line numbers for the code that is not covered so that you can write more test cases to get higher code coverage.
 
 You can also manually run `nosetests` with `coverage` (but `setup.cfg` does this already)
 
-    $ nosetests --with-coverage --cover-package=app
+```shell
+    $ nosetests --with-coverage --cover-package=service
+```
 
 Try and get as close to 100% coverage as you can.
 
 It's also a good idea to make sure that your Python code follows the PEP8 standard. `flake8` has been included in the `requirements.txt` file so that you can check if your code is compliant like this:
 
+```shell
     $ flake8 --count --max-complexity=10 --statistics model,service
+```
 
 I've also include `pylint` in the requirements. If you use a programmer's editor like Atom.io you can install plug-ins that will use `pylint` while you are editing. This catches a lot of errors while you code that would normally be caught at runtime. It's a good idea to always code with pylint active.
 
 When you are done, you can exit and shut down the vm with:
 
+```shell
     $ exit
     $ vagrant halt
+```
 
 If the VM is no longer needed you can remove it with:
 
+```shell
     $ vagrant destroy
-
+```
 
 ## What's featured in the project?
 

@@ -22,10 +22,10 @@ Test cases can be run with:
 
 import unittest
 import os
-from app.models import Pet, DataValidationError, db
-from app import app
+from service.models import Pet, DataValidationError, db
+from service import app
 
-DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
+DATABASE_URI = os.getenv("DATABASE_URI", "sqlite:///../db/test.db")
 
 ######################################################################
 #  T E S T   C A S E S
@@ -38,7 +38,7 @@ class TestPets(unittest.TestCase):
         """ These run once per Test suite """
         app.debug = False
         # Set up the test database
-        app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
 
     @classmethod
     def tearDownClass(cls):
@@ -46,7 +46,7 @@ class TestPets(unittest.TestCase):
 
     def setUp(self):
         Pet.init_db(app)
-        db.drop_all()    # clean up the last tests
+        db.drop_all()  # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
 
     def tearDown(self):
@@ -104,14 +104,14 @@ class TestPets(unittest.TestCase):
         pet = Pet(name="fido", category="dog", available=False)
         data = pet.serialize()
         self.assertNotEqual(data, None)
-        self.assertIn('id', data)
-        self.assertEqual(data['id'], None)
-        self.assertIn('name', data)
-        self.assertEqual(data['name'], "fido")
-        self.assertIn('category', data)
-        self.assertEqual(data['category'], "dog")
-        self.assertIn('available', data)
-        self.assertEqual(data['available'], False)
+        self.assertIn("id", data)
+        self.assertEqual(data["id"], None)
+        self.assertIn("name", data)
+        self.assertEqual(data["name"], "fido")
+        self.assertIn("category", data)
+        self.assertEqual(data["category"], "dog")
+        self.assertIn("available", data)
+        self.assertEqual(data["available"], False)
 
     def test_deserialize_a_pet(self):
         """ Test deserialization of a Pet """
@@ -163,5 +163,5 @@ class TestPets(unittest.TestCase):
 ######################################################################
 #   M A I N
 ######################################################################
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

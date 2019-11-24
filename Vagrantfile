@@ -8,11 +8,21 @@
 Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/xenial64"
+  config.vm.box = "ubuntu/bionic64"
+  config.vm.hostname = "flask-tdd"
+
   # set up network ip and port forwarding
   config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
   config.vm.network "private_network", ip: "192.168.33.10"
 
+  # Windows users need to change the permission of files and directories
+  # so that nosetests runs without extra arguments.
+  # Mac users can comment this next line out
+  config.vm.synced_folder ".", "/vagrant", mount_options: ["dmode=775,fmode=664"]
+
+  ######################################################################
+  # Create a virtual machine
+  ######################################################################
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
     vb.memory = "256"
@@ -21,6 +31,10 @@ Vagrant.configure(2) do |config|
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
   end
+
+  ######################################################################
+  # Copy some files to make developing easier
+  ######################################################################
 
   # Copy your .gitconfig file so that your git credentials are correct
   if File.exists?(File.expand_path("~/.gitconfig"))
@@ -37,22 +51,19 @@ Vagrant.configure(2) do |config|
     config.vm.provision "file", source: "~/.vimrc", destination: "~/.vimrc"
   end
 
-  # Windows users need to change the permission of files and directories
-  # so that nosetests runs without extra arguments.
-  # Mac users can comment this next line out
-  config.vm.synced_folder ".", "/vagrant", mount_options: ["dmode=775,fmode=664"]
-
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
+  ############################################################
+  # Create a Python 3 environment for development work
+  ############################################################
   config.vm.provision "shell", inline: <<-SHELL
+    # Update and install
     apt-get update
-    apt-get install -y git python-pip python-dev build-essential
-    apt-get -y autoremove
-    #pip install --upgrade pip
-    # Install app dependencies
-    cd /vagrant
-    pip install -r requirements.txt
+    apt-get install -y git tree wget python3-dev python3-pip python3-venv apt-transport-https
+    apt-get upgrade python3
+
+    # Create a Python3 Virtual Environment and Activate it in .profile
+    sudo -H -u vagrant sh -c 'python3 -m venv ~/venv'
+    sudo -H -u vagrant sh -c 'echo ". ~/venv/bin/activate" >> ~/.profile'
+    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && pip install -r requirements.txt'
   SHELL
 
 end
