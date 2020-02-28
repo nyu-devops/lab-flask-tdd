@@ -4,16 +4,13 @@ Package: app
 Package for the application models and services
 This module also sets up the logging to be used with gunicorn
 """
+import os
 import logging
 from flask import Flask
 
 # Create Flask application
 app = Flask(__name__)
-# We'll just use SQLite here so we don't need an external database
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///../db/development.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = "sup3r-s3cr3t"  # change for production
-app.config["LOGGING_LEVEL"] = logging.INFO
+app.config.from_object('config')
 
 # Import the routes After the Flask app is created
 from service import service, models

@@ -5,9 +5,6 @@ Thumbs.db
 # Vagrant
 .vagrant/
 
-# VS Code
-.vscode/
-
 # Test reports
 unittests.xml
 

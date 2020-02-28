@@ -25,7 +25,7 @@ Vagrant.configure(2) do |config|
   ######################################################################
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
-    vb.memory = "256"
+    vb.memory = "512"
     vb.cpus = 1
     # Fixes some DNS issues on some networks
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
@@ -65,5 +65,15 @@ Vagrant.configure(2) do |config|
     sudo -H -u vagrant sh -c 'echo ". ~/venv/bin/activate" >> ~/.profile'
     sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && pip install -r requirements.txt'
   SHELL
+
+  ######################################################################
+  # Add PostgreSQL docker container
+  ######################################################################
+  # docker run -d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data postgres
+  config.vm.provision :docker do |d|
+    d.pull_images "postgres:alpine"
+    d.run "postgres:alpine",
+       args: "-d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=postgres"
+  end
 
 end
