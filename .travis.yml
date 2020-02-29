@@ -1,6 +1,16 @@
 language: python
 python:
   - "3.6"
+
+services:
+  - postgresql
+
+env:
+  - DATABASE_URI=postgres://postgres:@localhost:5432/test
+
+before_script:
+  - psql -c 'create database test;' -U postgres
+
 # command to install dependencies
 install: "pip3 install -r requirements.txt"
 
