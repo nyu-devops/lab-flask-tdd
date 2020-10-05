@@ -185,7 +185,7 @@ def create_pets():
     check_content_type("application/json")
     pet = Pet()
     pet.deserialize(request.get_json())
-    pet.save()
+    pet.create()
     message = pet.serialize()
     location_url = url_for("get_pets", pet_id=pet.id, _external=True)
 
@@ -212,9 +212,9 @@ def update_pets(pet_id):
         raise NotFound("Pet with id '{}' was not found.".format(pet_id))
     pet.deserialize(request.get_json())
     pet.id = pet_id
-    pet.save()
+    pet.update()
 
-    app.logger.info("Pet with ID [%s] saved.", pet.id)
+    app.logger.info("Pet with ID [%s] updated.", pet.id)
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
 
 

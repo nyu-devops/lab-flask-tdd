@@ -1,13 +1,17 @@
+.PHONY: venv init test run
+
+venv:
+	$(info Creating Python 3 virtual environment...)
+	python3 -m venv venv
+
 init:
 	$(info Installing dependencies...)
 	pip install -r requirements.txt
 
 test:
 	$(info Running tests...)
-	python -m unittest discover
+	nosetests --with-spec --spec-color
 
 run:
 	$(info Starting service...)
-	python run.py
-
-.PHONY: init test
+	honcho start

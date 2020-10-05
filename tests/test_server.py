@@ -51,6 +51,7 @@ class TestPetServer(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        """ Run once after all tests """
         pass
 
     def setUp(self):
