@@ -59,7 +59,6 @@ class Pet(db.Model):
     category = db.Column(db.String(63))
     available = db.Column(db.Boolean())
 
-
     ##################################################
     # INSTANCE METHODS
     ##################################################
@@ -119,14 +118,13 @@ class Pet(db.Model):
             )
         return self
 
-
     ##################################################
     # CLASS METHODS
     ##################################################
 
     @classmethod
     def init_db(cls, app):
-        """ Initializes the database session
+        """Initializes the database session
 
         :param app: the Flask app
         :type data: Flask
@@ -147,7 +145,7 @@ class Pet(db.Model):
 
     @classmethod
     def find(cls, pet_id: int):
-        """ Finds a Pet by it's ID
+        """Finds a Pet by it's ID
 
         :param pet_id: the id of the Pet to find
         :type pet_id: int
@@ -161,7 +159,7 @@ class Pet(db.Model):
 
     @classmethod
     def find_or_404(cls, pet_id: int):
-        """ Find a Pet by it's id
+        """Find a Pet by it's id
 
         :param pet_id: the id of the Pet to find
         :type pet_id: int
@@ -175,7 +173,7 @@ class Pet(db.Model):
 
     @classmethod
     def find_by_name(cls, name: str):
-        """ Returns all Pets with the given name
+        """Returns all Pets with the given name
 
         :param name: the name of the Pets you want to match
         :type name: str
@@ -189,7 +187,7 @@ class Pet(db.Model):
 
     @classmethod
     def find_by_category(cls, category: str):
-        """ Returns all of the Pets in a category
+        """Returns all of the Pets in a category
 
         :param category: the category of the Pets you want to match
         :type category: str
@@ -202,8 +200,8 @@ class Pet(db.Model):
         return cls.query.filter(cls.category == category)
 
     @classmethod
-    def find_by_availability(cls, available: bool=True):
-        """ Returns all Pets by their availability
+    def find_by_availability(cls, available: bool = True):
+        """Returns all Pets by their availability
 
         :param available: True for pets that are available
         :type available: str
