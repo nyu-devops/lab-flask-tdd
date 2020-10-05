@@ -51,11 +51,18 @@ class Pet(db.Model):
     logger = logging.getLogger(__name__)
     app = None
 
+    ##################################################
     # Table Schema
+    ##################################################
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(63))
     category = db.Column(db.String(63))
     available = db.Column(db.Boolean())
+
+
+    ##################################################
+    # INSTANCE METHODS
+    ##################################################
 
     def __repr__(self):
         return "<Pet %r>" % (self.name)
@@ -89,12 +96,16 @@ class Pet(db.Model):
             "available": self.available,
         }
 
-    def deserialize(self, data):
+    def deserialize(self, data: dict):
         """
         Deserializes a Pet from a dictionary
 
-        Args:
-            data (dict): A dictionary containing the Pet data
+        :param data: a dictionary of attributes
+        :type data: dict
+
+        :return: a reference to self
+        :rtype: Pet
+
         """
         try:
             self.name = data["name"]
@@ -104,13 +115,23 @@ class Pet(db.Model):
             raise DataValidationError("Invalid pet: missing " + error.args[0])
         except TypeError as error:
             raise DataValidationError(
-                "Invalid pet: body of request contained" "bad or no data"
+                "Invalid pet: body of request contained bad or no data"
             )
         return self
 
+
+    ##################################################
+    # CLASS METHODS
+    ##################################################
+
     @classmethod
     def init_db(cls, app):
-        """ Initializes the database session """
+        """ Initializes the database session
+
+        :param app: the Flask app
+        :type data: Flask
+
+        """
         cls.logger.info("Initializing database")
         cls.app = app
         # This is where we initialize SQLAlchemy from the Flask app
@@ -125,43 +146,71 @@ class Pet(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, pet_id):
-        """ Finds a Pet by it's ID """
+    def find(cls, pet_id: int):
+        """ Finds a Pet by it's ID
+
+        :param pet_id: the id of the Pet to find
+        :type pet_id: int
+
+        :return: an instance with the pet_id, or None if not found
+        :rtype: Pet
+
+        """
         cls.logger.info("Processing lookup for id %s ...", pet_id)
         return cls.query.get(pet_id)
 
     @classmethod
-    def find_or_404(cls, pet_id):
-        """ Find a Pet by it's id """
+    def find_or_404(cls, pet_id: int):
+        """ Find a Pet by it's id
+
+        :param pet_id: the id of the Pet to find
+        :type pet_id: int
+
+        :return: an instance with the pet_id, or 404_NOT_FOUND if not found
+        :rtype: Pet
+
+        """
         cls.logger.info("Processing lookup or 404 for id %s ...", pet_id)
         return cls.query.get_or_404(pet_id)
 
     @classmethod
-    def find_by_name(cls, name):
+    def find_by_name(cls, name: str):
         """ Returns all Pets with the given name
 
-        Args:
-            name (string): the name of the Pets you want to match
+        :param name: the name of the Pets you want to match
+        :type name: str
+
+        :return: a collection of Pets with that name
+        :rtype: list
+
         """
         cls.logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
 
     @classmethod
-    def find_by_category(cls, category):
+    def find_by_category(cls, category: str):
         """ Returns all of the Pets in a category
 
-        Args:
-            category (string): the category of the Pets you want to match
+        :param category: the category of the Pets you want to match
+        :type category: str
+
+        :return: a collection of Pets in that category
+        :rtype: list
+
         """
         cls.logger.info("Processing category query for %s ...", category)
         return cls.query.filter(cls.category == category)
 
     @classmethod
-    def find_by_availability(cls, available=True):
+    def find_by_availability(cls, available: bool=True):
         """ Returns all Pets by their availability
 
-        Args:
-            available (boolean): True for pets that are available
+        :param available: True for pets that are available
+        :type available: str
+
+        :return: a collection of Pets that are available
+        :rtype: list
+
         """
         cls.logger.info("Processing available query for %s ...", available)
         return cls.query.filter(cls.available == available)
