@@ -35,13 +35,14 @@ class TestPets(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """ These run once per Test suite """
+        """ These run once before Test suite """
         app.debug = False
         # Set up the test database
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
 
     @classmethod
     def tearDownClass(cls):
+        """ These run once after Test suite """
         pass
 
     def setUp(self):
@@ -69,7 +70,7 @@ class TestPets(unittest.TestCase):
         pet = Pet(name="fido", category="dog", available=True)
         self.assertTrue(pet != None)
         self.assertEqual(pet.id, None)
-        pet.save()
+        pet.create()
         # Asert that it was assigned an id and shows up in the database
         self.assertEqual(pet.id, 1)
         pets = Pet.all()
@@ -78,11 +79,11 @@ class TestPets(unittest.TestCase):
     def test_update_a_pet(self):
         """ Update a Pet """
         pet = Pet(name="fido", category="dog", available=True)
-        pet.save()
+        pet.create()
         self.assertEqual(pet.id, 1)
-        # Change it an save it
+        # Change it an update it
         pet.category = "k9"
-        pet.save()
+        pet.update()
         self.assertEqual(pet.id, 1)
         # Fetch it back and make sure the id hasn't changed
         # but the data did change
@@ -93,7 +94,7 @@ class TestPets(unittest.TestCase):
     def test_delete_a_pet(self):
         """ Delete a Pet """
         pet = Pet(name="fido", category="dog", available=True)
-        pet.save()
+        pet.create()
         self.assertEqual(len(Pet.all()), 1)
         # delete the pet and make sure it isn't in the database
         pet.delete()
@@ -132,9 +133,9 @@ class TestPets(unittest.TestCase):
 
     def test_find_pet(self):
         """ Find a Pet by ID """
-        Pet(name="fido", category="dog", available=True).save()
+        Pet(name="fido", category="dog", available=True).create()
         kitty = Pet(name="kitty", category="cat", available=False)
-        kitty.save()
+        kitty.create()
         pet = Pet.find(kitty.id)
         self.assertIsNot(pet, None)
         self.assertEqual(pet.id, kitty.id)
@@ -143,8 +144,8 @@ class TestPets(unittest.TestCase):
 
     def test_find_by_category(self):
         """ Find Pets by Category """
-        Pet(name="fido", category="dog", available=True).save()
-        Pet(name="kitty", category="cat", available=False).save()
+        Pet(name="fido", category="dog", available=True).create()
+        Pet(name="kitty", category="cat", available=False).create()
         pets = Pet.find_by_category("cat")
         self.assertEqual(pets[0].category, "cat")
         self.assertEqual(pets[0].name, "kitty")
@@ -152,8 +153,8 @@ class TestPets(unittest.TestCase):
 
     def test_find_by_name(self):
         """ Find a Pet by Name """
-        Pet(name="fido", category="dog", available=True).save()
-        Pet(name="kitty", category="cat", available=False).save()
+        Pet(name="fido", category="dog", available=True).create()
+        Pet(name="kitty", category="cat", available=False).create()
         pets = Pet.find_by_name("kitty")
         self.assertEqual(pets[0].category, "cat")
         self.assertEqual(pets[0].name, "kitty")

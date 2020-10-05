@@ -60,12 +60,19 @@ class Pet(db.Model):
     def __repr__(self):
         return "<Pet %r>" % (self.name)
 
-    def save(self):
+    def create(self):
         """
-        Saves a Pet to the data store
+        Creates a Pet to the data store
+        """
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        """
+        Updates a Pet to the data store
         """
         if not self.id:
-            db.session.add(self)
+            raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
     def delete(self):
@@ -151,7 +158,6 @@ class Pet(db.Model):
 
     @classmethod
     def find_by_availability(cls, available=True):
-        """ Query that finds Pets by their availability """
         """ Returns all Pets by their availability
 
         Args:
