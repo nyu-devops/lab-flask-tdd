@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.config.from_object("config")
 
 # Import the routes After the Flask app is created
-from service import service, models
+from service import routes, models
 
 # Set up logging for production
 print("Setting up logging for {}...".format(__name__))
@@ -30,6 +30,6 @@ app.logger.info("  P E T   S T O R E   S E R V I C E  ".center(70, "*"))
 app.logger.info(70 * "*")
 
 # make our sqlalchemy tables
-service.init_db()
+routes.init_db()
 
 app.logger.info("Service inititalized!")
