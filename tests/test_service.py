@@ -40,7 +40,7 @@ DATABASE_URI = os.getenv("DATABASE_URI", "sqlite:///../db/test.db")
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
-class TestPetServer(unittest.TestCase):
+class TestPetService(unittest.TestCase):
     """ Pet Server Tests """
 
     @classmethod
