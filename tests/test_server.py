@@ -29,7 +29,8 @@ from flask_api import status  # HTTP Status Codes
 # from mock import MagicMock, patch
 from service.models import Pet, DataValidationError, db
 from .pet_factory import PetFactory
-from service import service
+from service import app
+from service.routes import init_db
 
 # Disable all but ciritcal erros suirng unittest
 logging.disable(logging.CRITICAL)
@@ -45,9 +46,10 @@ class TestPetServer(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """ Run once before all tests """
-        service.app.debug = False
+        app.debug = False
+        app.testing = True
         # Set up the test database
-        service.app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
 
     @classmethod
     def tearDownClass(cls):
@@ -56,10 +58,10 @@ class TestPetServer(unittest.TestCase):
 
     def setUp(self):
         """ Runs before each test """
-        service.init_db()
+        init_db()
         db.drop_all()  # clean up the last tests
         db.create_all()  # create new tables
-        self.app = service.app.test_client()
+        self.app = app.test_client()
 
     def tearDown(self):
         db.session.remove()
@@ -191,14 +193,14 @@ class TestPetServer(unittest.TestCase):
         for pet in data:
             self.assertEqual(pet["category"], test_category)
 
-    # @patch('app.service.Pet.find_by_name')
+    # @patch('app.routes.Pet.find_by_name')
     # def test_bad_request(self, bad_request_mock):
     #     """ Test a Bad Request error from Find By Name """
     #     bad_request_mock.side_effect = DataValidationError()
     #     resp = self.app.get('/pets', query_string='name=fido')
     #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
     #
-    # @patch('app.service.Pet.find_by_name')
+    # @patch('app.routes.Pet.find_by_name')
     # def test_mock_search_data(self, pet_find_mock):
     #     """ Test showing how to mock data """
     #     pet_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'fido'})]
