@@ -34,7 +34,7 @@ from service.routes import init_db
 # Disable all but ciritcal erros suirng unittest
 logging.disable(logging.CRITICAL)
 
-DATABASE_URI = os.getenv("DATABASE_URI", "sqlite:///../db/test.db")
+DATABASE_URI = os.getenv("DATABASE_URI", "postgres://postgres:postgres@localhost:5432/testdb")
 
 ######################################################################
 #  T E S T   C A S E S
