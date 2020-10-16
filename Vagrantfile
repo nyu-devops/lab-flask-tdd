@@ -76,4 +76,13 @@ Vagrant.configure(2) do |config|
        args: "-d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=postgres"
   end
 
+  ######################################################################
+  # Add a test database afer Postgres is provisioned
+  ######################################################################
+  config.vm.provision "shell", inline: <<-SHELL
+    # Create testdb database using postgres cli
+    docker exec postgres psql -c "create database testdb;" -U postgres
+    # Done
+  SHELL
+
 end
