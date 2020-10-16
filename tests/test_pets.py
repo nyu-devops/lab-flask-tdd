@@ -25,7 +25,7 @@ import os
 from service.models import Pet, DataValidationError, db
 from service import app
 
-DATABASE_URI = os.getenv("DATABASE_URI", "sqlite:///../db/test.db")
+DATABASE_URI = os.getenv("DATABASE_URI", "postgres://postgres:postgres@localhost:5432/testdb")
 
 ######################################################################
 #  T E S T   C A S E S
