@@ -81,6 +81,8 @@ Vagrant.configure(2) do |config|
   ######################################################################
   config.vm.provision "shell", inline: <<-SHELL
     # Create testdb database using postgres cli
+    echo "Creating test database"
+    sleep 10
     docker exec postgres psql -c "create database testdb;" -U postgres
     # Done
   SHELL
