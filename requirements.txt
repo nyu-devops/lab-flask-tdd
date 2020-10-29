@@ -20,4 +20,4 @@ httpie>=1.0.3
 
 # Code coverage
 coverage==4.5.4
-codecov==2.0.15
+codecov==2.1.10
