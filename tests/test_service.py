@@ -54,7 +54,7 @@ class TestPetService(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """ Run once after all tests """
-        db.dispose()
+        db.session.close()
 
     def setUp(self):
         """ Runs before each test """

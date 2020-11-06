@@ -44,7 +44,7 @@ class TestPets(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """ These run once after Test suite """
-        db.dispose()
+        db.session.close()
 
     def setUp(self):
         db.drop_all()  # clean up the last tests
