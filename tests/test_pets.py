@@ -39,14 +39,14 @@ class TestPets(unittest.TestCase):
         app.debug = False
         # Set up the test database
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        Pet.init_db(app)
 
     @classmethod
     def tearDownClass(cls):
         """ These run once after Test suite """
-        pass
+        db.dispose()
 
     def setUp(self):
-        Pet.init_db(app)
         db.drop_all()  # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
 
