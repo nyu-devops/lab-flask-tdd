@@ -1,0 +1,22 @@
+{
+	"name": "Python 3 & PostgeSQL",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspace",
+	"remoteUser": "vscode",
+	"extensions": [
+		"VisualVisualStudioExptTeam.vscodeintellicodeStudio",
+		"ms-python.python",
+		"ms-python.vscode-pylance",
+    	"wholroyd.jinja",
+		"cstrap.flask-snippets",
+		"yzhang.markdown-all-in-one",
+		"hnw.vscode-auto-open-markdown-preview",
+		"donjayamanne.githistory",
+		"redhat.vscode-yaml",
+		"bbenoist.vagrant",
+		"sonarsource.sonarlint-vscode"
+	],
+	"forwardPorts": [5000],
+	"postCreateCommand": "sudo pip install -r requirements.txt"
+}
