@@ -241,16 +241,10 @@ def delete_pets(pet_id):
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
-
-def init_db():
-    """ Initialies the SQLAlchemy app """
-    global app
-    Pet.init_db(app)
-
-
-def check_content_type(content_type):
+def check_content_type(media_type):
     """ Checks that the media type is correct """
-    if request.headers["Content-Type"] == content_type:
+    content_type = request.headers.get("Content-Type")
+    if content_type and content_type == media_type:
         return
-    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
-    abort(415, "Content-Type must be {}".format(content_type))
+    app.logger.error("Invalid Content-Type: %s", content_type)
+    abort(415, "Content-Type must be {}".format(media_type))
