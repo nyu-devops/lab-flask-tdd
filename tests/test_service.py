@@ -31,10 +31,13 @@ from .pet_factory import PetFactory
 from service import app
 from service.routes import init_db
 
-# Disable all but ciritcal erros suirng unittest
+# Disable all but ciritcal errors during normal test run
+# uncomment for debugging failing tests
 logging.disable(logging.CRITICAL)
 
 DATABASE_URI = os.getenv("DATABASE_URI", "postgres://postgres:postgres@localhost:5432/testdb")
+BASE_URL = '/pets'
+CONTENT_TYPE_JSON = "application/json"
 
 ######################################################################
 #  T E S T   C A S E S
@@ -72,7 +75,7 @@ class TestPetService(unittest.TestCase):
         for _ in range(count):
             test_pet = PetFactory()
             resp = self.app.post(
-                "/pets", json=test_pet.serialize(), content_type="application/json"
+                BASE_URL, json=test_pet.serialize(), content_type=CONTENT_TYPE_JSON
             )
             self.assertEqual(
                 resp.status_code, status.HTTP_201_CREATED, "Could not create test pet"
@@ -92,7 +95,7 @@ class TestPetService(unittest.TestCase):
     def test_get_pet_list(self):
         """ Get a list of Pets """
         self._create_pets(5)
-        resp = self.app.get("/pets")
+        resp = self.app.get(BASE_URL)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 5)
@@ -102,7 +105,7 @@ class TestPetService(unittest.TestCase):
         # get the id of a pet
         test_pet = self._create_pets(1)[0]
         resp = self.app.get(
-            "/pets/{}".format(test_pet.id), content_type="application/json"
+            "/pets/{}".format(test_pet.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -117,7 +120,7 @@ class TestPetService(unittest.TestCase):
         """ Create a new Pet """
         test_pet = PetFactory()
         resp = self.app.post(
-            "/pets", json=test_pet.serialize(), content_type="application/json"
+            BASE_URL, json=test_pet.serialize(), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
@@ -133,7 +136,7 @@ class TestPetService(unittest.TestCase):
             new_pet["available"], test_pet.available, "Availability does not match"
         )
         # Check that the location header was correct
-        resp = self.app.get(location, content_type="application/json")
+        resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_pet = resp.get_json()
         self.assertEqual(new_pet["name"], test_pet.name, "Names do not match")
@@ -149,7 +152,7 @@ class TestPetService(unittest.TestCase):
         # create a pet to update
         test_pet = PetFactory()
         resp = self.app.post(
-            "/pets", json=test_pet.serialize(), content_type="application/json"
+            BASE_URL, json=test_pet.serialize(), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
@@ -159,7 +162,7 @@ class TestPetService(unittest.TestCase):
         resp = self.app.put(
             "/pets/{}".format(new_pet["id"]),
             json=new_pet,
-            content_type="application/json",
+            content_type=CONTENT_TYPE_JSON,
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_pet = resp.get_json()
@@ -169,13 +172,13 @@ class TestPetService(unittest.TestCase):
         """ Delete a Pet """
         test_pet = self._create_pets(1)[0]
         resp = self.app.delete(
-            "/pets/{}".format(test_pet.id), content_type="application/json"
+            "/pets/{}".format(test_pet.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         # make sure they are deleted
         resp = self.app.get(
-            "/pets/{}".format(test_pet.id), content_type="application/json"
+            "/pets/{}".format(test_pet.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -184,7 +187,7 @@ class TestPetService(unittest.TestCase):
         pets = self._create_pets(10)
         test_category = pets[0].category
         category_pets = [pet for pet in pets if pet.category == test_category]
-        resp = self.app.get("/pets", query_string="category={}".format(test_category))
+        resp = self.app.get(BASE_URL, query_string="category={}".format(test_category))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), len(category_pets))
@@ -196,14 +199,14 @@ class TestPetService(unittest.TestCase):
     # def test_bad_request(self, bad_request_mock):
     #     """ Test a Bad Request error from Find By Name """
     #     bad_request_mock.side_effect = DataValidationError()
-    #     resp = self.app.get('/pets', query_string='name=fido')
+    #     resp = self.app.get(BASE_URL, query_string='name=fido')
     #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
     
     # @patch('service.routes.Pet.find_by_name')
     # def test_mock_search_data(self, pet_find_mock):
     #     """ Test showing how to mock data """
     #     pet_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'fido'})]
-    #     resp = self.app.get('/pets', query_string='name=fido')
+    #     resp = self.app.get(BASE_URL, query_string='name=fido')
     #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
 

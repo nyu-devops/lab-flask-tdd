@@ -77,7 +77,7 @@ Vagrant.configure(2) do |config|
   end
 
   ######################################################################
-  # Add a test database afer Postgres is provisioned
+  # Add a test database after Postgres is provisioned
   ######################################################################
   config.vm.provision "shell", inline: <<-SHELL
     # Create testdb database using postgres cli
