@@ -29,7 +29,7 @@ from flask_api import status  # HTTP Status Codes
 from service.models import Pet, DataValidationError, db
 from .pet_factory import PetFactory
 from service import app
-from service.routes import init_db
+from service.models import init_db
 
 # Disable all but ciritcal errors during normal test run
 # uncomment for debugging failing tests
@@ -52,7 +52,7 @@ class TestPetService(unittest.TestCase):
         app.testing = True
         # Set up the test database
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
-        init_db()
+        init_db(app)
 
     @classmethod
     def tearDownClass(cls):
@@ -146,6 +146,13 @@ class TestPetService(unittest.TestCase):
         self.assertEqual(
             new_pet["available"], test_pet.available, "Availability does not match"
         )
+
+    def test_create_pet_no_content_type(self):
+        """ Create a Pet without content type """
+        resp = self.app.post(
+            BASE_URL, data="bad content"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_update_pet(self):
         """ Update an existing Pet """

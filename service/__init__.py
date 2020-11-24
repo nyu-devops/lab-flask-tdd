@@ -30,6 +30,6 @@ app.logger.info("  P E T   S T O R E   S E R V I C E  ".center(70, "*"))
 app.logger.info(70 * "*")
 
 # make our sqlalchemy tables
-routes.init_db()
+models.init_db(app)
 
 app.logger.info("Service inititalized!")
