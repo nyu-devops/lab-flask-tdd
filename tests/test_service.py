@@ -167,7 +167,7 @@ class TestPetService(unittest.TestCase):
         new_pet = resp.get_json()
         new_pet["category"] = "unknown"
         resp = self.app.put(
-            "/pets/{}".format(new_pet["id"]),
+            "{0}/{1}".format(BASE_URL, new_pet["id"]),
             json=new_pet,
             content_type=CONTENT_TYPE_JSON,
         )
@@ -179,13 +179,13 @@ class TestPetService(unittest.TestCase):
         """ Delete a Pet """
         test_pet = self._create_pets(1)[0]
         resp = self.app.delete(
-            "/pets/{}".format(test_pet.id), content_type=CONTENT_TYPE_JSON
+            "{0}/{1}".format(BASE_URL, test_pet.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         # make sure they are deleted
         resp = self.app.get(
-            "/pets/{}".format(test_pet.id), content_type=CONTENT_TYPE_JSON
+            "{0}/{1}".format(BASE_URL, test_pet.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
