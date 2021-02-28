@@ -1,15 +1,16 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
+############################################################
+# NYU: CSCI-GA.2820-001 DevOps and Agile Methodologies 
+# Instructor: John Rofrano
+############################################################
 Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/bionic64"
-  config.vm.hostname = "flask-tdd"
+  # config.vm.box = "ubuntu/bionic64"
+  config.vm.box = "bento/ubuntu-20.04"
+  config.vm.hostname = "ubuntu"
 
   # set up network ip and port forwarding
   config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
@@ -21,15 +22,28 @@ Vagrant.configure(2) do |config|
   config.vm.synced_folder ".", "/vagrant", mount_options: ["dmode=775,fmode=664"]
 
   ######################################################################
-  # Create a virtual machine
+  # Provider for VirtualBox
   ######################################################################
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
-    vb.memory = "512"
+    vb.memory = "1024"
     vb.cpus = 1
     # Fixes some DNS issues on some networks
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+  end
+
+  ############################################################
+  # Provider for Docker
+  ############################################################
+  config.vm.provider :docker do |docker, override|
+    override.vm.box = nil
+    docker.image = "rofrano/vagrant-provider:ubuntu"
+    docker.remains_running = true
+    docker.has_ssh = true
+    docker.privileged = true
+    docker.create_args = ["-v", "/sys/fs/cgroup:/sys/fs/cgroup:ro"]
+    # docker.create_args = ["--platform=linux/arm64", "-v", "/sys/fs/cgroup:/sys/fs/cgroup:ro"]
   end
 
   ######################################################################
@@ -57,7 +71,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
     # Update and install
     apt-get update
-    apt-get install -y git tree wget python3-dev python3-pip python3-venv apt-transport-https
+    apt-get install -y git tree wget vim python3-dev python3-pip python3-venv apt-transport-https libpq-dev
     apt-get upgrade python3
 
     # Create a Python3 Virtual Environment and Activate it in .profile

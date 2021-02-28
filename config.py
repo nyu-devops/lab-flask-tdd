@@ -2,7 +2,6 @@ import os
 import logging
 
 # Get configuration from environment
-# DATABASE_URI = "sqlite:///../db/development.db"
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
 )
