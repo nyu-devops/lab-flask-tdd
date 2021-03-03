@@ -3,7 +3,7 @@ FROM python:3.8-slim
 
 # Add any tools that are needed beyond Python 3.8
 RUN apt-get update \
-    && apt-get install -y sudo git zip tree curl wget jq \
+    && apt-get install -y sudo git zip tree curl wget jq gcc libpq-dev \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
