@@ -95,9 +95,9 @@ Vagrant.configure(2) do |config|
   ######################################################################
   config.vm.provision "shell", inline: <<-SHELL
     # Create testdb database using postgres cli
+    echo "Pausing for 60 seconds to allow PostgreSQL to initialize..."
+    sleep 60
     echo "Creating test database"
-    service docker start
-    sleep 10
     docker exec postgres psql -c "create database testdb;" -U postgres
     # Done
   SHELL
