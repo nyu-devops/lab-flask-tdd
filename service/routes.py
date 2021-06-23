@@ -1,4 +1,4 @@
-# Copyright 2016, 2017 John J. Rofrano. All Rights Reserved.
+# Copyright 2016, 2019 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,98 +28,23 @@ import os
 import sys
 import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
-from flask_api import status  # HTTP Status Codes
+from . import status  # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from .models import Pet, DataValidationError
+from service.models import Pet, DataValidationError
 
 # Import Flask application
 from . import app
-
-######################################################################
-# Error Handlers
-######################################################################
-@app.errorhandler(DataValidationError)
-def request_validation_error(error):
-    """ Handles Value Errors from bad data """
-    return bad_request(error)
-
-
-@app.errorhandler(status.HTTP_400_BAD_REQUEST)
-def bad_request(error):
-    """ Handles bad reuests with 400_BAD_REQUEST """
-    app.logger.warning(str(error))
-    return (
-        jsonify(
-            status=status.HTTP_400_BAD_REQUEST, error="Bad Request", message=str(error)
-        ),
-        status.HTTP_400_BAD_REQUEST,
-    )
-
-
-@app.errorhandler(status.HTTP_404_NOT_FOUND)
-def not_found(error):
-    """ Handles resources not found with 404_NOT_FOUND """
-    app.logger.warning(str(error))
-    return (
-        jsonify(
-            status=status.HTTP_404_NOT_FOUND, error="Not Found", message=str(error)
-        ),
-        status.HTTP_404_NOT_FOUND,
-    )
-
-
-@app.errorhandler(status.HTTP_405_METHOD_NOT_ALLOWED)
-def method_not_supported(error):
-    """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-    app.logger.warning(str(error))
-    return (
-        jsonify(
-            status=status.HTTP_405_METHOD_NOT_ALLOWED,
-            error="Method not Allowed",
-            message=str(error),
-        ),
-        status.HTTP_405_METHOD_NOT_ALLOWED,
-    )
-
-
-@app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-def mediatype_not_supported(error):
-    """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
-    app.logger.warning(str(error))
-    return (
-        jsonify(
-            status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            error="Unsupported media type",
-            message=str(error),
-        ),
-        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-    )
-
-
-@app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
-def internal_server_error(error):
-    """ Handles unexpected server error with 500_SERVER_ERROR """
-    app.logger.error(str(error))
-    return (
-        jsonify(
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            error="Internal Server Error",
-            message=str(error),
-        ),
-        status.HTTP_500_INTERNAL_SERVER_ERROR,
-    )
-
 
 ######################################################################
 # GET INDEX
 ######################################################################
 @app.route("/")
 def index():
-    """ Root URL response """
+    """Root URL response"""
     app.logger.info("Request for Root URL")
     return (
         jsonify(
@@ -136,7 +61,7 @@ def index():
 ######################################################################
 @app.route("/pets", methods=["GET"])
 def list_pets():
-    """ Returns all of the Pets """
+    """Returns all of the Pets"""
     app.logger.info("Request for pet list")
     pets = []
     category = request.args.get("category")
@@ -241,10 +166,14 @@ def delete_pets(pet_id):
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
+
 def check_content_type(media_type):
-    """ Checks that the media type is correct """
+    """Checks that the media type is correct"""
     content_type = request.headers.get("Content-Type")
     if content_type and content_type == media_type:
         return
     app.logger.error("Invalid Content-Type: %s", content_type)
-    abort(415, "Content-Type must be {}".format(media_type))
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        "Content-Type must be {}".format(media_type),
+    )

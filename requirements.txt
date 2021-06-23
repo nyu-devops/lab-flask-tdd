@@ -1,13 +1,17 @@
+# Freeze these depndencies
+Werkzeug==1.0.1
+
 # Dependencies
 Flask==1.1.2
 Flask-API==1.1
-Flask-Log-Request-ID==0.10.1
+# Flask-Log-Request-ID==0.10.1
 SQLAlchemy==1.3.23
 Flask-SQLAlchemy==2.4.4
+python-dotenv==0.10.3
 psycopg2-binary==2.8.4
 
 # Runtime
-gunicorn==20.0.2
+gunicorn==20.0.4
 honcho>=1.0.1
 
 # Code quality

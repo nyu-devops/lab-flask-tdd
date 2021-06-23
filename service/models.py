@@ -1,4 +1,4 @@
-# Copyright 2016, 2017 John Rofrano. All Rights Reserved.
+# Copyright 2016, 2021 John Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """
 Models for Pet Demo Service
 
@@ -28,19 +29,32 @@ available (boolean) - True for pets that are available for adoption
 
 """
 import logging
+from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
+
+logger = logging.getLogger("flask.app")
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+
 def init_db(app):
-    """ Initialies the SQLAlchemy app """
+    """Initialies the SQLAlchemy app"""
     Pet.init_db(app)
 
 
 class DataValidationError(Exception):
-    """ Used for an data validation errors when deserializing """
+    """Used for an data validation errors when deserializing"""
+
     pass
+
+
+class Gender(Enum):
+    """Enumeration of valid Pet Genders"""
+
+    Male = 0
+    Female = 1
+    Unknown = 3
 
 
 class Pet(db.Model):
@@ -51,54 +65,61 @@ class Pet(db.Model):
     from us by SQLAlchemy's object relational mappings (ORM)
     """
 
-    logger = logging.getLogger(__name__)
     app = None
 
     ##################################################
     # Table Schema
     ##################################################
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(63))
-    category = db.Column(db.String(63))
-    available = db.Column(db.Boolean())
+    name = db.Column(db.String(63), nullable=False)
+    category = db.Column(db.String(63), nullable=False)
+    available = db.Column(db.Boolean(), nullable=False, default=False)
+    gender = db.Column(
+        db.Enum(Gender), nullable=False, server_default=(Gender.Unknown.name)
+    )
 
     ##################################################
     # INSTANCE METHODS
     ##################################################
 
     def __repr__(self):
-        return "<Pet %r>" % (self.name)
+        return "<Pet %r id=[%s]>" % (self.name, self.id)
 
     def create(self):
         """
-        Creates a Pet to the data store
+        Creates a Pet to the database
         """
+        logger.info("Creating %s", self.name)
+        self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
 
     def update(self):
         """
-        Updates a Pet to the data store
+        Updates a Pet to the database
         """
+        logger.info("Saving %s", self.name)
         if not self.id:
             raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
     def delete(self):
-        """ Removes a Pet from the data store """
+        """Removes a Pet from the data store"""
+        logger.info("Deleting %s", self.name)
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
-        """ Serializes a Pet into a dictionary """
+        """Serializes a Pet into a dictionary"""
         return {
             "id": self.id,
             "name": self.name,
             "category": self.category,
             "available": self.available,
+            "gender": self.gender.name,  # convert enum to string
         }
 
-    def deserialize(self, data: dict):
+    def deserialize(self, data):
         """
         Deserializes a Pet from a dictionary
 
@@ -113,6 +134,7 @@ class Pet(db.Model):
             self.name = data["name"]
             self.category = data["category"]
             self.available = data["available"]
+            self.gender = getattr(Gender, data["gender"])  # create enum from string
         except KeyError as error:
             raise DataValidationError("Invalid pet: missing " + error.args[0])
         except TypeError as error:
@@ -133,7 +155,7 @@ class Pet(db.Model):
         :type data: Flask
 
         """
-        cls.logger.info("Initializing database")
+        logger.info("Initializing database")
         cls.app = app
         # This is where we initialize SQLAlchemy from the Flask app
         db.init_app(app)
@@ -142,12 +164,12 @@ class Pet(db.Model):
 
     @classmethod
     def all(cls):
-        """ Returns all of the Pets in the database """
-        cls.logger.info("Processing all Pets")
+        """Returns all of the Pets in the database"""
+        logger.info("Processing all Pets")
         return cls.query.all()
 
     @classmethod
-    def find(cls, pet_id: int):
+    def find(cls, pet_id):
         """Finds a Pet by it's ID
 
         :param pet_id: the id of the Pet to find
@@ -157,11 +179,11 @@ class Pet(db.Model):
         :rtype: Pet
 
         """
-        cls.logger.info("Processing lookup for id %s ...", pet_id)
+        logger.info("Processing lookup for id %s ...", pet_id)
         return cls.query.get(pet_id)
 
     @classmethod
-    def find_or_404(cls, pet_id: int):
+    def find_or_404(cls, pet_id):
         """Find a Pet by it's id
 
         :param pet_id: the id of the Pet to find
@@ -171,11 +193,11 @@ class Pet(db.Model):
         :rtype: Pet
 
         """
-        cls.logger.info("Processing lookup or 404 for id %s ...", pet_id)
+        logger.info("Processing lookup or 404 for id %s ...", pet_id)
         return cls.query.get_or_404(pet_id)
 
     @classmethod
-    def find_by_name(cls, name: str):
+    def find_by_name(cls, name):
         """Returns all Pets with the given name
 
         :param name: the name of the Pets you want to match
@@ -185,11 +207,11 @@ class Pet(db.Model):
         :rtype: list
 
         """
-        cls.logger.info("Processing name query for %s ...", name)
+        logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
 
     @classmethod
-    def find_by_category(cls, category: str):
+    def find_by_category(cls, category):
         """Returns all of the Pets in a category
 
         :param category: the category of the Pets you want to match
@@ -199,11 +221,11 @@ class Pet(db.Model):
         :rtype: list
 
         """
-        cls.logger.info("Processing category query for %s ...", category)
+        logger.info("Processing category query for %s ...", category)
         return cls.query.filter(cls.category == category)
 
     @classmethod
-    def find_by_availability(cls, available: bool = True):
+    def find_by_availability(cls, available=True):
         """Returns all Pets by their availability
 
         :param available: True for pets that are available
@@ -213,5 +235,19 @@ class Pet(db.Model):
         :rtype: list
 
         """
-        cls.logger.info("Processing available query for %s ...", available)
+        logger.info("Processing available query for %s ...", available)
         return cls.query.filter(cls.available == available)
+
+    @classmethod
+    def find_by_gender(cls, gender=Gender.Unknown):
+        """Returns all Pets by their Gender
+
+        :param gender: values are ['Male', 'Female', 'Unknown']
+        :type available: enum
+
+        :return: a collection of Pets that are available
+        :rtype: list
+
+        """
+        logger.info("Processing gender query for %s ...", gender.name)
+        return cls.query.filter(cls.gender == gender)

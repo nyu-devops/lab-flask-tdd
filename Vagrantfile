@@ -6,10 +6,7 @@
 # Instructor: John Rofrano
 ############################################################
 Vagrant.configure(2) do |config|
-  # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://atlas.hashicorp.com/search.
-  # config.vm.box = "ubuntu/bionic64"
-  config.vm.box = "bento/ubuntu-20.04"
+  config.vm.box = "ubuntu/focal64"
   config.vm.hostname = "ubuntu"
 
   # set up network ip and port forwarding
@@ -34,7 +31,7 @@ Vagrant.configure(2) do |config|
   end
 
   ############################################################
-  # Provider for Docker
+  # Provider for Docker on Intel or ARM (aarch64)
   ############################################################
   config.vm.provider :docker do |docker, override|
     override.vm.box = nil
@@ -42,8 +39,9 @@ Vagrant.configure(2) do |config|
     docker.remains_running = true
     docker.has_ssh = true
     docker.privileged = true
-    docker.create_args = ["-v", "/sys/fs/cgroup:/sys/fs/cgroup:ro"]
-    # docker.create_args = ["--platform=linux/arm64", "-v", "/sys/fs/cgroup:/sys/fs/cgroup:ro"]
+    docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:ro"]
+    # Uncomment to force arm64 for testing images on Intel
+    # docker.create_args = ["--platform=linux/arm64"]     
   end
 
   ######################################################################
@@ -69,15 +67,24 @@ Vagrant.configure(2) do |config|
   # Create a Python 3 environment for development work
   ############################################################
   config.vm.provision "shell", inline: <<-SHELL
-    # Update and install
+    echo "****************************************"
+    echo " INSTALLING PYTHON 3 ENVIRONMENT..."
+    echo "****************************************"
+    # Install Python 3 and dev tools 
     apt-get update
-    apt-get install -y git tree wget vim python3-dev python3-pip python3-venv apt-transport-https libpq-dev
+    apt-get install -y git tree wget vim python3-dev python3-pip python3-venv apt-transport-https
     apt-get upgrade python3
+    
+    # Need PostgreSQL development library to compile on arm64
+    apt-get install -y libpq-dev
 
     # Create a Python3 Virtual Environment and Activate it in .profile
     sudo -H -u vagrant sh -c 'python3 -m venv ~/venv'
     sudo -H -u vagrant sh -c 'echo ". ~/venv/bin/activate" >> ~/.profile'
-    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && pip install -r requirements.txt'
+    
+    # Install app dependencies in virtual environment as vagrant user
+    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && pip install -U pip && pip install wheel'
+    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && pip install -r requirements.txt'      
   SHELL
 
   ######################################################################

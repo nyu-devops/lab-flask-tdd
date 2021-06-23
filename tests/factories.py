@@ -11,3 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+"""
+Test Factory to make fake objects for testing
+"""
+import factory
+from factory.fuzzy import FuzzyChoice
+from service.models import Pet, Gender
+
+
+class PetFactory(factory.Factory):
+    """Creates fake pets that you don't have to feed"""
+
+    class Meta:
+        model = Pet
+
+    id = factory.Sequence(lambda n: n)
+    name = factory.Faker("first_name")
+    category = FuzzyChoice(choices=["dog", "cat", "bird", "fish"])
+    available = FuzzyChoice(choices=[True, False])
+    gender = FuzzyChoice(choices=[Gender.Male, Gender.Female, Gender.Unknown])
