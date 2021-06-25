@@ -157,15 +157,15 @@ class TestPetServer(unittest.TestCase):
             new_pet["available"], test_pet.available, "Availability does not match"
         )
 
-    def test_create_pet_no_data(self):
-        """Create a Pet with missing data"""
-        resp = self.app.post(BASE_URL, json={}, content_type=CONTENT_TYPE_JSON)
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+    # def test_create_pet_no_data(self):
+    #     """Create a Pet with missing data"""
+    #     resp = self.app.post(BASE_URL, json={}, content_type=CONTENT_TYPE_JSON)
+    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_create_pet_no_content_type(self):
-        """Create a Pet with no content type"""
-        resp = self.app.post(BASE_URL)
-        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+    # def test_create_pet_no_content_type(self):
+    #     """Create a Pet with no content type"""
+    #     resp = self.app.post(BASE_URL)
+    #     self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_update_pet(self):
         """Update an existing Pet"""
