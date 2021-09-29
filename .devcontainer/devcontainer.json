@@ -11,12 +11,13 @@
     	"wholroyd.jinja",
 		"cstrap.flask-snippets",
 		"yzhang.markdown-all-in-one",
-		"hnw.vscode-auto-open-markdown-preview",
+		"DavidAnson.vscode-markdownlint",
+		"bierner.github-markdown-preview",        
 		"donjayamanne.githistory",
 		"redhat.vscode-yaml",
 		"bbenoist.vagrant",
 		"sonarsource.sonarlint-vscode"
 	],
 	"forwardPorts": [5000],
-	"postCreateCommand": "sudo pip install -r requirements.txt"
+	"postCreateCommand": "sudo pip install -U pip wheel && sudo pip install -r requirements.txt"
 }

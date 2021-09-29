@@ -1,7 +1,7 @@
 # Image for a Python 3 development environment
-FROM python:3.8-slim
+FROM python:3.9-slim
 
-# Add any tools that are needed beyond Python 3.8
+# Add any tools that are needed beyond Python 3.9
 RUN apt-get update \
     && apt-get install -y sudo git zip tree curl wget jq gcc libpq-dev \
     && apt-get autoremove -y \
