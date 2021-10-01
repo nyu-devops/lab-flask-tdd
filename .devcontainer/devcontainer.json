@@ -2,8 +2,8 @@
 	"name": "Python 3 & PostgeSQL",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
-	"workspaceFolder": "/workspace",
-	"remoteUser": "vscode",
+	"workspaceFolder": "/app",
+	"remoteUser": "devops",
 	"extensions": [
 		"VisualVisualStudioExptTeam.vscodeintellicodeStudio",
 		"ms-python.python",
@@ -19,5 +19,5 @@
 		"sonarsource.sonarlint-vscode"
 	],
 	"forwardPorts": [5000],
-	"postCreateCommand": "sudo pip install -U pip wheel && sudo pip install -r requirements.txt"
+	//"postCreateCommand": "sudo pip install -U pip wheel && sudo pip install -r requirements.txt"
 }
