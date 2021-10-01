@@ -170,6 +170,22 @@ class TestPetModel(unittest.TestCase):
         pet = Pet()
         self.assertRaises(DataValidationError, pet.deserialize, data)
 
+    def test_deserialize_bad_available(self):
+        """ Test deserialization of bad available attribute """
+        test_pet = PetFactory()
+        data = test_pet.serialize()
+        data["available"] = "true"
+        pet = Pet()
+        self.assertRaises(DataValidationError, pet.deserialize, data)
+
+    def test_deserialize_bad_gender(self):
+        """ Test deserialization of bad gender attribute """
+        test_pet = PetFactory()
+        data = test_pet.serialize()
+        data["gender"] = "male" # wrong case
+        pet = Pet()
+        self.assertRaises(DataValidationError, pet.deserialize, data)
+
     def test_find_pet(self):
         """Find a Pet by ID"""
         pets = PetFactory.create_batch(3)

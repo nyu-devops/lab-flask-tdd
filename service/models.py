@@ -123,19 +123,19 @@ class Pet(db.Model):
     def deserialize(self, data: dict):
         """
         Deserializes a Pet from a dictionary
-
-        :param data: a dictionary of attributes
-        :type data: dict
-
-        :return: a reference to self
-        :rtype: Pet
-
+        Args:
+            data (dict): A dictionary containing the Pet data
         """
         try:
             self.name = data["name"]
             self.category = data["category"]
-            self.available = data["available"]
+            if isinstance(data["available"], bool):
+                self.available = data["available"]
+            else:
+                raise DataValidationError("Invalid type for boolean [available]: " + str(type(data["available"])))
             self.gender = getattr(Gender, data["gender"])  # create enum from string
+        except AttributeError as error:
+            raise DataValidationError("Invalid attribute: " + error.args[0])
         except KeyError as error:
             raise DataValidationError("Invalid pet: missing " + error.args[0])
         except TypeError as error:
