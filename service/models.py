@@ -30,6 +30,7 @@ available (boolean) - True for pets that are available for adoption
 """
 import logging
 from enum import Enum
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 logger = logging.getLogger("flask.app")
@@ -65,7 +66,7 @@ class Pet(db.Model):
     from us by SQLAlchemy's object relational mappings (ORM)
     """
 
-    app = None
+    app:Flask=None
 
     ##################################################
     # Table Schema
@@ -109,7 +110,7 @@ class Pet(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def serialize(self):
+    def serialize(self) -> dict:
         """Serializes a Pet into a dictionary"""
         return {
             "id": self.id,
@@ -119,7 +120,7 @@ class Pet(db.Model):
             "gender": self.gender.name,  # convert enum to string
         }
 
-    def deserialize(self, data):
+    def deserialize(self, data: dict):
         """
         Deserializes a Pet from a dictionary
 
@@ -148,7 +149,7 @@ class Pet(db.Model):
     ##################################################
 
     @classmethod
-    def init_db(cls, app):
+    def init_db(cls, app:Flask):
         """Initializes the database session
 
         :param app: the Flask app
@@ -163,13 +164,13 @@ class Pet(db.Model):
         db.create_all()  # make our sqlalchemy tables
 
     @classmethod
-    def all(cls):
+    def all(cls) -> list:
         """Returns all of the Pets in the database"""
         logger.info("Processing all Pets")
         return cls.query.all()
 
     @classmethod
-    def find(cls, pet_id):
+    def find(cls, pet_id:int):
         """Finds a Pet by it's ID
 
         :param pet_id: the id of the Pet to find
@@ -183,7 +184,7 @@ class Pet(db.Model):
         return cls.query.get(pet_id)
 
     @classmethod
-    def find_or_404(cls, pet_id):
+    def find_or_404(cls, pet_id:int):
         """Find a Pet by it's id
 
         :param pet_id: the id of the Pet to find
@@ -197,7 +198,7 @@ class Pet(db.Model):
         return cls.query.get_or_404(pet_id)
 
     @classmethod
-    def find_by_name(cls, name):
+    def find_by_name(cls, name:str) -> list:
         """Returns all Pets with the given name
 
         :param name: the name of the Pets you want to match
@@ -211,7 +212,7 @@ class Pet(db.Model):
         return cls.query.filter(cls.name == name)
 
     @classmethod
-    def find_by_category(cls, category):
+    def find_by_category(cls, category:str) -> list:
         """Returns all of the Pets in a category
 
         :param category: the category of the Pets you want to match
@@ -225,7 +226,7 @@ class Pet(db.Model):
         return cls.query.filter(cls.category == category)
 
     @classmethod
-    def find_by_availability(cls, available=True):
+    def find_by_availability(cls, available:bool=True) -> list:
         """Returns all Pets by their availability
 
         :param available: True for pets that are available
@@ -239,7 +240,7 @@ class Pet(db.Model):
         return cls.query.filter(cls.available == available)
 
     @classmethod
-    def find_by_gender(cls, gender=Gender.Unknown):
+    def find_by_gender(cls, gender:Gender=Gender.Unknown) -> list:
         """Returns all Pets by their Gender
 
         :param gender: values are ['Male', 'Female', 'Unknown']
