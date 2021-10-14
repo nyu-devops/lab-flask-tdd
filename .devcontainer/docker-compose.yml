@@ -13,8 +13,6 @@ services:
     volumes:
       - ..:/app
       - ~/.ssh/:/home/devops/.ssh/
-      - ~/.bluemix/:/home/devops/.bluemix/
-      - ~/.kube/:/home/devops/.kube/
     command: sleep infinity
     environment:
       FLASK_APP: service:app
