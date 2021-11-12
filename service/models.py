@@ -66,8 +66,6 @@ class Pet(db.Model):
     from us by SQLAlchemy's object relational mappings (ORM)
     """
 
-    app:Flask=None
-
     ##################################################
     # Table Schema
     ##################################################
@@ -157,7 +155,6 @@ class Pet(db.Model):
 
         """
         logger.info("Initializing database")
-        cls.app = app
         # This is where we initialize SQLAlchemy from the Flask app
         db.init_app(app)
         app.app_context().push()
