@@ -1,0 +1,18 @@
+---
+# This manifest deploys a Python Flask application with a Cloudant database
+applications:
+- name: lab-flask-tdd
+  path: .
+  instances: 1
+  memory: 128M
+  routes:
+  - route: lab-flask-tdd.us-south.cf.appdomain.cloud
+  disk_quota: 1024M
+  buildpacks: 
+  - python_buildpack
+  timeout: 180
+  services:
+  - ElephantSQL
+  env:
+    FLASK_APP : service:app
+    FLASK_DEBUG : false
