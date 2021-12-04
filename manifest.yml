@@ -1,15 +1,16 @@
 ---
 # This manifest deploys a Python Flask application with a Cloudant database
+# To change the hostname deploy with:
+#   cf push "${CF_APP}" -n <new-hostname>
 applications:
 - name: lab-flask-tdd
   path: .
   instances: 1
   memory: 128M
-  routes:
-  - route: lab-flask-tdd.us-south.cf.appdomain.cloud
+  hostname: lab-flask-tdd
+  domain: us-south.cf.appdomain.cloud
   disk_quota: 1024M
-  buildpacks: 
-  - python_buildpack
+  buildpack: python_buildpack
   timeout: 180
   services:
   - ElephantSQL
