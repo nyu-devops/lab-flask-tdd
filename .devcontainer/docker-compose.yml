@@ -16,7 +16,7 @@ services:
     command: sleep infinity
     environment:
       FLASK_APP: service:app
-      DATABASE_URI: postgres://postgres:postgres@postgres:5432/postgres
+      DATABASE_URI: postgresql://postgres:postgres@postgres:5432/postgres
     networks:
       - dev
     depends_on:
