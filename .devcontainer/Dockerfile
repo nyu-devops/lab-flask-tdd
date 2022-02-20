@@ -19,12 +19,14 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
+# Added libraries for PostgreSQL
+RUN apt-get install -y gcc libpq-dev
+
 # Set up the Python development environment
 WORKDIR /app
 COPY requirements.txt .
-RUN apt-get install -y gcc libpq-dev \
-    && pip install -U pip wheel \
-    && pip install -r requirements.txt
+RUN python -m pip install --upgrade pip wheel && \
+    pip install -r requirements.txt
 
 EXPOSE 8000
 
