@@ -18,7 +18,6 @@ Package for the application models and service routes
 This module creates and configures the Flask app and sets up the logging
 and SQL database
 """
-import os
 import sys
 import logging
 from flask import Flask
@@ -27,7 +26,7 @@ from flask import Flask
 app = Flask(__name__)
 app.config.from_object("config")
 
-# Import the rutes After the Flask app is created
+# Import the routes After the Flask app is created
 from service import routes, models, error_handlers
 
 # Set up logging for production
@@ -56,4 +55,4 @@ except Exception as error:
     # gunicorn requires exit code 4 to stop spawning workers when they die
     sys.exit(4)
 
-app.logger.info("Service inititalized!")
+app.logger.info("Service initialized!")

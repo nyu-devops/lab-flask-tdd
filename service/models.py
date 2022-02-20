@@ -40,7 +40,7 @@ db = SQLAlchemy()
 
 
 def init_db(app):
-    """Initialies the SQLAlchemy app"""
+    """Initialize the SQLAlchemy app"""
     Pet.init_db(app)
 
 
@@ -130,7 +130,10 @@ class Pet(db.Model):
             if isinstance(data["available"], bool):
                 self.available = data["available"]
             else:
-                raise DataValidationError("Invalid type for boolean [available]: " + str(type(data["available"])))
+                raise DataValidationError(
+                    "Invalid type for boolean [available]: "
+                    + str(type(data["available"]))
+                )
             self.gender = getattr(Gender, data["gender"])  # create enum from string
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0])
@@ -138,7 +141,7 @@ class Pet(db.Model):
             raise DataValidationError("Invalid pet: missing " + error.args[0])
         except TypeError as error:
             raise DataValidationError(
-                "Invalid pet: body of request contained bad or no data"
+                "Invalid pet: body of request contained bad or no data " + str(error)
             )
         return self
 
@@ -147,7 +150,7 @@ class Pet(db.Model):
     ##################################################
 
     @classmethod
-    def init_db(cls, app:Flask):
+    def init_db(cls, app: Flask):
         """Initializes the database session
 
         :param app: the Flask app
@@ -167,7 +170,7 @@ class Pet(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, pet_id:int):
+    def find(cls, pet_id: int):
         """Finds a Pet by it's ID
 
         :param pet_id: the id of the Pet to find
@@ -181,7 +184,7 @@ class Pet(db.Model):
         return cls.query.get(pet_id)
 
     @classmethod
-    def find_or_404(cls, pet_id:int):
+    def find_or_404(cls, pet_id: int):
         """Find a Pet by it's id
 
         :param pet_id: the id of the Pet to find
@@ -195,7 +198,7 @@ class Pet(db.Model):
         return cls.query.get_or_404(pet_id)
 
     @classmethod
-    def find_by_name(cls, name:str) -> list:
+    def find_by_name(cls, name: str) -> list:
         """Returns all Pets with the given name
 
         :param name: the name of the Pets you want to match
@@ -209,7 +212,7 @@ class Pet(db.Model):
         return cls.query.filter(cls.name == name)
 
     @classmethod
-    def find_by_category(cls, category:str) -> list:
+    def find_by_category(cls, category: str) -> list:
         """Returns all of the Pets in a category
 
         :param category: the category of the Pets you want to match
@@ -223,7 +226,7 @@ class Pet(db.Model):
         return cls.query.filter(cls.category == category)
 
     @classmethod
-    def find_by_availability(cls, available:bool=True) -> list:
+    def find_by_availability(cls, available: bool = True) -> list:
         """Returns all Pets by their availability
 
         :param available: True for pets that are available
@@ -237,7 +240,7 @@ class Pet(db.Model):
         return cls.query.filter(cls.available == available)
 
     @classmethod
-    def find_by_gender(cls, gender:Gender=Gender.Unknown) -> list:
+    def find_by_gender(cls, gender: Gender = Gender.Unknown) -> list:
         """Returns all Pets by their Gender
 
         :param gender: values are ['Male', 'Female', 'Unknown']
