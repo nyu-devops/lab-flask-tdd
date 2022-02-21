@@ -8,14 +8,14 @@ services:
       context: ..
       dockerfile: .devcontainer/Dockerfile
     hostname: nyu
-    ports:
-      - 5000:5000
+    # ports:
+    #   - 8000:8000
     volumes:
       - ..:/app
-      - ~/.ssh/:/home/devops/.ssh/
     command: sleep infinity
     environment:
       FLASK_APP: service:app
+      FLASK_ENV: development
       DATABASE_URI: postgresql://postgres:postgres@postgres:5432/postgres
     networks:
       - dev
@@ -24,7 +24,6 @@ services:
 
   postgres:
     image: postgres:alpine
-    restart: always
     ports:
       - 5432:5432
     environment:
