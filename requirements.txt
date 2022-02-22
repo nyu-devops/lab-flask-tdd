@@ -1,7 +1,7 @@
 # Dependencies
 Flask==2.0.2
 Flask-SQLAlchemy==2.5.1
-psycopg2-binary==2.9.2
+psycopg2==2.9.3
 python-dotenv==0.19.2
 
 # Runtime
