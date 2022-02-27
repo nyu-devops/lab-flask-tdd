@@ -47,15 +47,12 @@ def init_db(app):
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
 
-    pass
-
 
 class Gender(Enum):
     """Enumeration of valid Pet Genders"""
-
-    Male = 0
-    Female = 1
-    Unknown = 3
+    MALE = 0
+    FEMALE = 1
+    UNKNOWN = 3
 
 
 class Pet(db.Model):
@@ -74,7 +71,7 @@ class Pet(db.Model):
     category = db.Column(db.String(63), nullable=False)
     available = db.Column(db.Boolean(), nullable=False, default=False)
     gender = db.Column(
-        db.Enum(Gender), nullable=False, server_default=(Gender.Unknown.name)
+        db.Enum(Gender), nullable=False, server_default=(Gender.UNKNOWN.name)
     )
 
     ##################################################
@@ -240,10 +237,10 @@ class Pet(db.Model):
         return cls.query.filter(cls.available == available)
 
     @classmethod
-    def find_by_gender(cls, gender: Gender = Gender.Unknown) -> list:
+    def find_by_gender(cls, gender: Gender = Gender.UNKNOWN) -> list:
         """Returns all Pets by their Gender
 
-        :param gender: values are ['Male', 'Female', 'Unknown']
+        :param gender: values are ['MALE', 'FEMALE', 'UNKNOWN']
         :type available: enum
 
         :return: a collection of Pets that are available

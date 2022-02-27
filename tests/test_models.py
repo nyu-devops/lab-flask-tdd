@@ -71,26 +71,26 @@ class TestPetModel(unittest.TestCase):
 
     def test_create_a_pet(self):
         """Create a pet and assert that it exists"""
-        pet = Pet(name="fido", category="dog", available=True, gender=Gender.Male)
-        self.assertTrue(pet != None)
+        pet = Pet(name="fido", category="dog", available=True, gender=Gender.MALE)
+        self.assertTrue(pet is not None)
         self.assertEqual(pet.id, None)
         self.assertEqual(pet.name, "fido")
         self.assertEqual(pet.category, "dog")
         self.assertEqual(pet.available, True)
-        self.assertEqual(pet.gender, Gender.Male)
-        pet = Pet(name="fido", category="dog", available=False, gender=Gender.Female)
+        self.assertEqual(pet.gender, Gender.MALE)
+        pet = Pet(name="fido", category="dog", available=False, gender=Gender.FEMALE)
         self.assertEqual(pet.available, False)
-        self.assertEqual(pet.gender, Gender.Female)
+        self.assertEqual(pet.gender, Gender.FEMALE)
 
     def test_add_a_pet(self):
         """Create a pet and add it to the database"""
         pets = Pet.all()
         self.assertEqual(pets, [])
-        pet = Pet(name="fido", category="dog", available=True, gender=Gender.Male)
-        self.assertTrue(pet != None)
+        pet = Pet(name="fido", category="dog", available=True, gender=Gender.MALE)
+        self.assertTrue(pet is not None)
         self.assertEqual(pet.id, None)
         pet.create()
-        # Asert that it was assigned an id and shows up in the database
+        # Assert that it was assigned an id and shows up in the database
         self.assertEqual(pet.id, 1)
         pets = Pet.all()
         self.assertEqual(len(pets), 1)
@@ -147,7 +147,7 @@ class TestPetModel(unittest.TestCase):
             "name": "kitty",
             "category": "cat",
             "available": True,
-            "gender": "Female",
+            "gender": "FEMALE",
         }
         pet = Pet()
         pet.deserialize(data)
@@ -156,7 +156,7 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(pet.name, "kitty")
         self.assertEqual(pet.category, "cat")
         self.assertEqual(pet.available, True)
-        self.assertEqual(pet.gender, Gender.Female)
+        self.assertEqual(pet.gender, Gender.FEMALE)
 
     def test_deserialize_missing_data(self):
         """Test deserialization of a Pet with missing data"""
@@ -235,17 +235,17 @@ class TestPetModel(unittest.TestCase):
 
     def test_find_by_gender(self):
         """Find Pets by Gender"""
-        Pet(name="fido", category="dog", available=True, gender=Gender.Male).create()
+        Pet(name="fido", category="dog", available=True, gender=Gender.MALE).create()
         Pet(
-            name="kitty", category="cat", available=False, gender=Gender.Female
+            name="kitty", category="cat", available=False, gender=Gender.FEMALE
         ).create()
-        Pet(name="fifi", category="dog", available=True, gender=Gender.Male).create()
-        pets = Pet.find_by_gender(Gender.Female)
+        Pet(name="fifi", category="dog", available=True, gender=Gender.MALE).create()
+        pets = Pet.find_by_gender(Gender.FEMALE)
         pet_list = [pet for pet in pets]
         self.assertEqual(len(pet_list), 1)
         self.assertEqual(pets[0].name, "kitty")
         self.assertEqual(pets[0].category, "cat")
-        pets = Pet.find_by_gender(Gender.Male)
+        pets = Pet.find_by_gender(Gender.MALE)
         pet_list = [pet for pet in pets]
         self.assertEqual(len(pet_list), 2)
 
