@@ -86,7 +86,8 @@ class Pet(db.Model):
         Creates a Pet to the database
         """
         logger.info("Creating %s", self.name)
-        self.id = None  # id must be none to generate next primary key
+        # id must be none to generate next primary key
+        self.id = None  # pylint: disable=invalid-name
         db.session.add(self)
         db.session.commit()
 

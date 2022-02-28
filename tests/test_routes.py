@@ -20,7 +20,7 @@ Test cases can be run with the following:
   coverage report -m
   codecov --token=$CODECOV_TOKEN
 
-  While debugging just these tests it's convinient to use this:
+  While debugging just these tests it's convenient to use this:
     nosetests --stop tests/test_service.py:TestPetServer
 """
 
@@ -30,12 +30,11 @@ import unittest
 
 # from unittest.mock import MagicMock, patch
 from urllib.parse import quote_plus
-from service import status  # HTTP Status Codes
+from service import app, status
 from service.models import db, init_db
-from service.routes import app
 from .factories import PetFactory
 
-# Disable all but ciritcal errors during normal test run
+# Disable all but critical errors during normal test run
 # uncomment for debugging failing tests
 logging.disable(logging.CRITICAL)
 

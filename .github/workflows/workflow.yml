@@ -45,6 +45,9 @@ jobs:
           python -m pip install --upgrade pip wheel
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+      - name: Linting
+        run: pylint **/*.py
+
       - name: Run unit tests with nose
         run: nosetests
         env:
