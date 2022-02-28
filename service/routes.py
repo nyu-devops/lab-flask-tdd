@@ -28,7 +28,7 @@ from flask import jsonify, request, url_for, make_response, abort
 from werkzeug.exceptions import NotFound
 from service.models import Pet
 from . import status  # HTTP Status Codes
-from . import app # Import Flask application
+from . import app  # Import Flask application
 
 ######################################################################
 # GET INDEX

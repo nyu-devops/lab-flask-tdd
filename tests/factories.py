@@ -23,8 +23,9 @@ from service.models import Pet, Gender
 class PetFactory(factory.Factory):
     """Creates fake pets that you don't have to feed"""
 
-    class Meta: # pylint: disable=too-few-public-methods
+    class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to data model"""
+
         model = Pet
 
     id = factory.Sequence(lambda n: n)

@@ -35,6 +35,7 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
 
+
 ######################################################################
 #  P E T   M O D E L   T E S T   C A S E S
 ######################################################################
@@ -172,7 +173,7 @@ class TestPetModel(unittest.TestCase):
         self.assertRaises(DataValidationError, pet.deserialize, data)
 
     def test_deserialize_bad_available(self):
-        """ Test deserialization of bad available attribute """
+        """Test deserialization of bad available attribute"""
         test_pet = PetFactory()
         data = test_pet.serialize()
         data["available"] = "true"
@@ -180,10 +181,10 @@ class TestPetModel(unittest.TestCase):
         self.assertRaises(DataValidationError, pet.deserialize, data)
 
     def test_deserialize_bad_gender(self):
-        """ Test deserialization of bad gender attribute """
+        """Test deserialization of bad gender attribute"""
         test_pet = PetFactory()
         data = test_pet.serialize()
-        data["gender"] = "male" # wrong case
+        data["gender"] = "male"  # wrong case
         pet = Pet()
         self.assertRaises(DataValidationError, pet.deserialize, data)
 
