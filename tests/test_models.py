@@ -97,6 +97,18 @@ class TestPetModel(unittest.TestCase):
         pets = Pet.all()
         self.assertEqual(len(pets), 1)
 
+    def test_read_a_pet(self):
+        """Read a Pet"""
+        pet = PetFactory()
+        logging.debug(pet)
+        pet.create()
+        self.assertEqual(pet.id, 1)
+        # Fetch it back 
+        found_pet = Pet.find(pet.id)
+        self.assertEqual(found_pet.id, pet.id)
+        self.assertEqual(found_pet.name, pet.name)
+        self.assertEqual(found_pet.category, pet.category)
+
     def test_update_a_pet(self):
         """Update a Pet"""
         pet = PetFactory()
@@ -125,6 +137,18 @@ class TestPetModel(unittest.TestCase):
         # delete the pet and make sure it isn't in the database
         pet.delete()
         self.assertEqual(len(Pet.all()), 0)
+
+    def test_list_all_pets(self):
+        """List Pets in the database"""
+        pets = Pet.all()
+        self.assertEqual(pets, [])
+        # Create 5 Pets
+        for i in range(5):
+            pet = PetFactory()
+            pet.create()
+        # See if we get back 5 pets
+        pets = Pet.all()
+        self.assertEqual(len(pets), 5)
 
     def test_serialize_a_pet(self):
         """Test serialization of a Pet"""
