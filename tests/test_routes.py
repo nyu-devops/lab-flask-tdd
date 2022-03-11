@@ -144,6 +144,9 @@ class TestPetServer(unittest.TestCase):
         self.assertEqual(
             new_pet["available"], test_pet.available, "Availability does not match"
         )
+        self.assertEqual(
+            new_pet["gender"], test_pet.gender.name, "Gender does not match"
+        )
         # Check that the location header was correct
         resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -154,6 +157,9 @@ class TestPetServer(unittest.TestCase):
         )
         self.assertEqual(
             new_pet["available"], test_pet.available, "Availability does not match"
+        )
+        self.assertEqual(
+            new_pet["gender"], test_pet.gender.name, "Gender does not match"
         )
 
     # def test_create_pet_no_data(self):
