@@ -1,3 +1,6 @@
+# Werkzeug keeps breakng Flask!
+Werkzeug==2.0.3
+
 # Dependencies
 Flask==2.0.2
 Flask-SQLAlchemy==2.5.1
