@@ -1,3 +1,4 @@
+// spell: disable
 {
 	"name": "Python 3 & PostgeSQL",
 	"dockerComposeFile": "docker-compose.yml",
@@ -17,11 +18,13 @@
 		"donjayamanne.githistory",
 		"GitHub.vscode-pull-request-github",
 		"hbenl.vscode-test-explorer",
+		"LittleFoxTeam.vscode-python-test-adapter",
 		"njpwerner.autodocstring",
 		"redhat.vscode-yaml",
 		"streetsidesoftware.code-spell-checker",
 		"wholroyd.jinja",
-		"bbenoist.vagrant"
+		"bbenoist.vagrant",
+        "SonarSource.sonarlint-vscode"
 	],
 	//"forwardPorts": [8000],
 	"postCreateCommand": "pipenv install --dev"
