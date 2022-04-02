@@ -8,8 +8,7 @@ RUN apt-get update && \
     apt-get clean -y
 
 # Add Java JRE-11 for SonarLint
-RUN ARCH=x64; \
-    if [ $(uname -m) == aarch64 ]; then ARCH=aarch64; fi && \
+RUN if [ $(uname -m) = 'aarch64' ]; then ARCH=aarch64; else ARCH=x64; fi && \
     mkdir -p /usr/lib/jvm && \
     wget -qO - https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.9.1+1/OpenJDK11U-jre_${ARCH}_linux_hotspot_11.0.9.1_1.tar.gz | tar xzvf - -C /usr/lib/jvm && \
     export JAVA_HOME=/usr/lib/jvm/jdk-11.0.9.1+1-jre && \

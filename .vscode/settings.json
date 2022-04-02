@@ -1,4 +1,5 @@
 {
+    "python.pythonPath": "/app/.venv/bin/python",
     "sonarlint.ls.javaHome": "/usr/lib/jvm/jdk-11.0.9.1+1-jre",
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
