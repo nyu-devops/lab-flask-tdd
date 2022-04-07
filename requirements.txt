@@ -1,4 +1,4 @@
-# Werkzeug keeps breakng Flask!
+# Werkzeug keeps breaking Flask!
 Werkzeug==2.0.3
 
 # Dependencies
