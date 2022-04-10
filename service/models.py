@@ -30,6 +30,7 @@ available (boolean) - True for pets that are available for adoption
 """
 import logging
 from enum import Enum
+from datetime import date
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -74,6 +75,7 @@ class Pet(db.Model):
     gender = db.Column(
         db.Enum(Gender), nullable=False, server_default=(Gender.UNKNOWN.name)
     )
+    birthday = db.Column(db.Date(), nullable=False, default=date.today())
 
     ##################################################
     # INSTANCE METHODS
@@ -115,6 +117,7 @@ class Pet(db.Model):
             "category": self.category,
             "available": self.available,
             "gender": self.gender.name,  # convert enum to string
+            "birthday": self.birthday.isoformat()
         }
 
     def deserialize(self, data: dict):
@@ -134,6 +137,7 @@ class Pet(db.Model):
                     + str(type(data["available"]))
                 )
             self.gender = getattr(Gender, data["gender"])  # create enum from string
+            self.birthday = date.fromisoformat(data["birthday"])
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0])
         except KeyError as error:
