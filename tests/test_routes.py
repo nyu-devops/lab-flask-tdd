@@ -31,7 +31,7 @@ import unittest
 # from unittest.mock import MagicMock, patch
 from urllib.parse import quote_plus
 from service import app, status
-from service.models import db, init_db
+from service.models import db, init_db, Pet
 from .factories import PetFactory
 
 # Disable all but critical errors during normal test run
@@ -69,13 +69,12 @@ class TestPetServer(unittest.TestCase):
 
     def setUp(self):
         """Runs before each test"""
-        db.drop_all()  # clean up the last tests
-        db.create_all()  # create new tables
         self.app = app.test_client()
+        db.session.query(Pet).delete() # clean up the last tests
+        db.session.commit()
 
     def tearDown(self):
         db.session.remove()
-        db.drop_all()
 
     def _create_pets(self, count):
         """Factory method to create pets in bulk"""
@@ -113,7 +112,7 @@ class TestPetServer(unittest.TestCase):
         # get the id of a pet
         test_pet = self._create_pets(1)[0]
         resp = self.app.get(
-            "/pets/{}".format(test_pet.id), content_type=CONTENT_TYPE_JSON
+            f"{BASE_URL}/{test_pet.id}", content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -121,7 +120,7 @@ class TestPetServer(unittest.TestCase):
 
     def test_get_pet_not_found(self):
         """Get a Pet thats not found"""
-        resp = self.app.get("/pets/0")
+        resp = self.app.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_pet(self):
@@ -209,7 +208,7 @@ class TestPetServer(unittest.TestCase):
         logging.debug(new_pet)
         new_pet["category"] = "unknown"
         resp = self.app.put(
-            "/pets/{}".format(new_pet["id"]),
+            f"{BASE_URL}/{new_pet['id']}",
             json=new_pet,
             content_type=CONTENT_TYPE_JSON,
         )

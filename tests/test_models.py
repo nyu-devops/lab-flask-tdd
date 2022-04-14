@@ -60,13 +60,12 @@ class TestPetModel(unittest.TestCase):
 
     def setUp(self):
         """This runs before each test"""
-        db.drop_all()  # clean up the last tests
-        db.create_all()  # make our sqlalchemy tables
+        db.session.query(Pet).delete() # clean up the last tests
+        db.session.commit()
 
     def tearDown(self):
         """This runs after each test"""
         db.session.remove()
-        db.drop_all()
 
     ######################################################################
     #  T E S T   C A S E S
@@ -95,7 +94,7 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(pet.id, None)
         pet.create()
         # Assert that it was assigned an id and shows up in the database
-        self.assertEqual(pet.id, 1)
+        self.assertIsNotNone(pet.id)
         pets = Pet.all()
         self.assertEqual(len(pets), 1)
 
@@ -103,8 +102,9 @@ class TestPetModel(unittest.TestCase):
         """Read a Pet"""
         pet = PetFactory()
         logging.debug(pet)
+        pet.id = None
         pet.create()
-        self.assertEqual(pet.id, 1)
+        self.assertIsNotNone(pet.id)
         # Fetch it back 
         found_pet = Pet.find(pet.id)
         self.assertEqual(found_pet.id, pet.id)
@@ -115,9 +115,10 @@ class TestPetModel(unittest.TestCase):
         """Update a Pet"""
         pet = PetFactory()
         logging.debug(pet)
+        pet.id = None
         pet.create()
         logging.debug(pet)
-        self.assertEqual(pet.id, 1)
+        self.assertIsNotNone(pet.id)
         # Change it an save it
         pet.category = "k9"
         original_id = pet.id
@@ -128,7 +129,7 @@ class TestPetModel(unittest.TestCase):
         # but the data did change
         pets = Pet.all()
         self.assertEqual(len(pets), 1)
-        self.assertEqual(pets[0].id, 1)
+        self.assertEqual(pets[0].id, original_id)
         self.assertEqual(pets[0].category, "k9")
 
     def test_update_no_id(self):
