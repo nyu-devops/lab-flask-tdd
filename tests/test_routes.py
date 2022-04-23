@@ -113,7 +113,7 @@ class TestPetServer(unittest.TestCase):
         # get the id of a pet
         test_pet = self._create_pets(1)[0]
         resp = self.app.get(
-            "/pets/{}".format(test_pet.id), content_type=CONTENT_TYPE_JSON
+            f"{BASE_URL}/{test_pet.id}", content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -121,46 +121,40 @@ class TestPetServer(unittest.TestCase):
 
     def test_get_pet_not_found(self):
         """Get a Pet thats not found"""
-        resp = self.app.get("/pets/0")
+        resp = self.app.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        data = resp.get_json()
+        logging.debug("Response data = %s", data)
+        self.assertIn("was not found", data["message"])
 
     def test_create_pet(self):
         """Create a new Pet"""
         test_pet = PetFactory()
-        logging.debug(test_pet)
+        logging.debug("Test Pet: %s", test_pet.serialize())
         resp = self.app.post(
             BASE_URL, json=test_pet.serialize(), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        
         # Make sure location header is set
         location = resp.headers.get("Location", None)
         self.assertIsNotNone(location)
+        
         # Check the data is correct
         new_pet = resp.get_json()
-        self.assertEqual(new_pet["name"], test_pet.name, "Names do not match")
-        self.assertEqual(
-            new_pet["category"], test_pet.category, "Categories do not match"
-        )
-        self.assertEqual(
-            new_pet["available"], test_pet.available, "Availability does not match"
-        )
-        self.assertEqual(
-            new_pet["gender"], test_pet.gender.name, "Gender does not match"
-        )
+        self.assertEqual(new_pet["name"], test_pet.name)
+        self.assertEqual(new_pet["category"], test_pet.category)
+        self.assertEqual(new_pet["available"], test_pet.available)
+        self.assertEqual(new_pet["gender"], test_pet.gender.name)
+        
         # Check that the location header was correct
         resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_pet = resp.get_json()
         self.assertEqual(new_pet["name"], test_pet.name, "Names do not match")
-        self.assertEqual(
-            new_pet["category"], test_pet.category, "Categories do not match"
-        )
-        self.assertEqual(
-            new_pet["available"], test_pet.available, "Availability does not match"
-        )
-        self.assertEqual(
-            new_pet["gender"], test_pet.gender.name, "Gender does not match"
-        )
+        self.assertEqual(new_pet["category"], test_pet.category)
+        self.assertEqual(new_pet["available"], test_pet.available)
+        self.assertEqual(new_pet["gender"], test_pet.gender.name)
 
     # def test_create_pet_no_data(self):
     #     """Create a Pet with missing data"""
@@ -209,7 +203,7 @@ class TestPetServer(unittest.TestCase):
         logging.debug(new_pet)
         new_pet["category"] = "unknown"
         resp = self.app.put(
-            "/pets/{}".format(new_pet["id"]),
+            f"{BASE_URL}/{new_pet['id']}",
             json=new_pet,
             content_type=CONTENT_TYPE_JSON,
         )
@@ -221,13 +215,13 @@ class TestPetServer(unittest.TestCase):
         """Delete a Pet"""
         test_pet = self._create_pets(1)[0]
         resp = self.app.delete(
-            "{0}/{1}".format(BASE_URL, test_pet.id), content_type=CONTENT_TYPE_JSON
+            f"{BASE_URL}/{test_pet.id}", content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         # make sure they are deleted
         resp = self.app.get(
-            "{0}/{1}".format(BASE_URL, test_pet.id), content_type=CONTENT_TYPE_JSON
+            f"{BASE_URL}/{test_pet.id}", content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
