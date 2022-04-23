@@ -31,7 +31,7 @@ import unittest
 # from unittest.mock import MagicMock, patch
 from urllib.parse import quote_plus
 from service import app, status
-from service.models import db, init_db
+from service.models import db, init_db, Pet
 from .factories import PetFactory
 
 # Disable all but critical errors during normal test run
@@ -69,13 +69,12 @@ class TestPetServer(unittest.TestCase):
 
     def setUp(self):
         """Runs before each test"""
-        db.drop_all()  # clean up the last tests
-        db.create_all()  # create new tables
         self.app = app.test_client()
+        db.session.query(Pet).delete() # clean up the last tests
+        db.session.commit()
 
     def tearDown(self):
         db.session.remove()
-        db.drop_all()
 
     def _create_pets(self, count):
         """Factory method to create pets in bulk"""

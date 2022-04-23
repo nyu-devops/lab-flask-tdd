@@ -26,6 +26,7 @@ While debugging just these tests it's convenient to use this:
 import os
 import logging
 import unittest
+from datetime import date
 from werkzeug.exceptions import NotFound
 from service.models import Pet, Gender, DataValidationError, db
 from service import app
@@ -59,13 +60,12 @@ class TestPetModel(unittest.TestCase):
 
     def setUp(self):
         """This runs before each test"""
-        db.drop_all()  # clean up the last tests
-        db.create_all()  # make our sqlalchemy tables
+        db.session.query(Pet).delete() # clean up the last tests
+        db.session.commit()
 
     def tearDown(self):
         """This runs after each test"""
         db.session.remove()
-        db.drop_all()
 
     ######################################################################
     #  T E S T   C A S E S
@@ -74,6 +74,7 @@ class TestPetModel(unittest.TestCase):
     def test_create_a_pet(self):
         """Create a pet and assert that it exists"""
         pet = Pet(name="Fido", category="dog", available=True, gender=Gender.MALE)
+        self.assertEqual(str(pet), "<Pet 'Fido' id=[None]>")
         self.assertTrue(pet is not None)
         self.assertEqual(pet.id, None)
         self.assertEqual(pet.name, "Fido")
@@ -93,7 +94,7 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(pet.id, None)
         pet.create()
         # Assert that it was assigned an id and shows up in the database
-        self.assertEqual(pet.id, 1)
+        self.assertIsNotNone(pet.id)
         pets = Pet.all()
         self.assertEqual(len(pets), 1)
 
@@ -101,8 +102,9 @@ class TestPetModel(unittest.TestCase):
         """Read a Pet"""
         pet = PetFactory()
         logging.debug(pet)
+        pet.id = None
         pet.create()
-        self.assertEqual(pet.id, 1)
+        self.assertIsNotNone(pet.id)
         # Fetch it back 
         found_pet = Pet.find(pet.id)
         self.assertEqual(found_pet.id, pet.id)
@@ -113,9 +115,10 @@ class TestPetModel(unittest.TestCase):
         """Update a Pet"""
         pet = PetFactory()
         logging.debug(pet)
+        pet.id = None
         pet.create()
         logging.debug(pet)
-        self.assertEqual(pet.id, 1)
+        self.assertIsNotNone(pet.id)
         # Change it an save it
         pet.category = "k9"
         original_id = pet.id
@@ -126,8 +129,15 @@ class TestPetModel(unittest.TestCase):
         # but the data did change
         pets = Pet.all()
         self.assertEqual(len(pets), 1)
-        self.assertEqual(pets[0].id, 1)
+        self.assertEqual(pets[0].id, original_id)
         self.assertEqual(pets[0].category, "k9")
+
+    def test_update_no_id(self):
+        """Update a Pet with no id"""
+        pet = PetFactory()
+        logging.debug(pet)
+        pet.id = None
+        self.assertRaises(DataValidationError, pet.update)
 
     def test_delete_a_pet(self):
         """Delete a Pet"""
@@ -165,39 +175,36 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(data["available"], pet.available)
         self.assertIn("gender", data)
         self.assertEqual(data["gender"], pet.gender.name)
+        self.assertIn("birthday", data)
+        self.assertEqual(date.fromisoformat(data["birthday"]), pet.birthday)
 
     def test_deserialize_a_pet(self):
-        """Test deserialization of a Pet"""
-        data = {
-            "id": 1,
-            "name": "Kitty",
-            "category": "cat",
-            "available": True,
-            "gender": "FEMALE",
-        }
+        """Test de-serialization of a Pet"""
+        data = PetFactory().serialize()
         pet = Pet()
         pet.deserialize(data)
         self.assertNotEqual(pet, None)
         self.assertEqual(pet.id, None)
-        self.assertEqual(pet.name, "Kitty")
-        self.assertEqual(pet.category, "cat")
-        self.assertEqual(pet.available, True)
-        self.assertEqual(pet.gender, Gender.FEMALE)
+        self.assertEqual(pet.name, data["name"])
+        self.assertEqual(pet.category, data["category"])
+        self.assertEqual(pet.available, data["available"])
+        self.assertEqual(pet.gender.name, data["gender"])
+        self.assertEqual(pet.birthday, date.fromisoformat(data["birthday"]))
 
     def test_deserialize_missing_data(self):
-        """Test deserialization of a Pet with missing data"""
+        """Test de-serialization of a Pet with missing data"""
         data = {"id": 1, "name": "Kitty", "category": "cat"}
         pet = Pet()
         self.assertRaises(DataValidationError, pet.deserialize, data)
 
     def test_deserialize_bad_data(self):
-        """Test deserialization of bad data"""
+        """Test de-serialization of bad data"""
         data = "this is not a dictionary"
         pet = Pet()
         self.assertRaises(DataValidationError, pet.deserialize, data)
 
     def test_deserialize_bad_available(self):
-        """Test deserialization of bad available attribute"""
+        """Test de-serialization of bad available attribute"""
         test_pet = PetFactory()
         data = test_pet.serialize()
         data["available"] = "true"
@@ -205,7 +212,7 @@ class TestPetModel(unittest.TestCase):
         self.assertRaises(DataValidationError, pet.deserialize, data)
 
     def test_deserialize_bad_gender(self):
-        """Test deserialization of bad gender attribute"""
+        """Test de-serialization of bad gender attribute"""
         test_pet = PetFactory()
         data = test_pet.serialize()
         data["gender"] = "male"  # wrong case
