@@ -7,12 +7,16 @@
             "label": "TDD tests",
             "type": "shell",
             "command": "nosetests",
-            "group": "test",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
             "presentation": {
                 "reveal": "always",
-                "panel": "dedicated",
-            }
-        },
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        }
     ]
         
 }
