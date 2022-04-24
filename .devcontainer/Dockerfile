@@ -24,9 +24,7 @@ RUN apt-get install -y gcc libpq-dev
 
 # Set up the Python development environment
 WORKDIR /app
-COPY requirements.txt .
-RUN python -m pip install --upgrade pip wheel && \
-    pip install -r requirements.txt
+RUN python -m pip install --upgrade pip wheel
 
 ENV PORT 8000
 EXPOSE $PORT

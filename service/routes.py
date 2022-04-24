@@ -25,7 +25,6 @@ DELETE /pets/{id} - deletes a Pet record in the database
 """
 
 from flask import jsonify, request, url_for, make_response, abort
-from werkzeug.exceptions import NotFound
 from service.models import Pet
 from . import status  # HTTP Status Codes
 from . import app  # Import Flask application
@@ -82,7 +81,7 @@ def get_pets(pet_id):
     app.logger.info("Request for pet with id: %s", pet_id)
     pet = Pet.find(pet_id)
     if not pet:
-        raise NotFound("Pet with id '{}' was not found.".format(pet_id))
+        abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
 
     app.logger.info("Returning pet: %s", pet.name)
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
@@ -123,9 +122,11 @@ def update_pets(pet_id):
     """
     app.logger.info("Request to update pet with id: %s", pet_id)
     check_content_type("application/json")
+
     pet = Pet.find(pet_id)
     if not pet:
-        raise NotFound("Pet with id '{}' was not found.".format(pet_id))
+        abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
+
     pet.deserialize(request.get_json())
     pet.id = pet_id
     pet.update()

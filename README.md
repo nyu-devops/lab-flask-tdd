@@ -4,6 +4,7 @@
 [![Build Status](https://github.com/nyu-devops/lab-flask-tdd/actions/workflows/workflow.yml/badge.svg)](https://github.com/nyu-devops/lab-flask-tdd/actions)
 [![codecov](https://codecov.io/gh/nyu-devops/lab-flask-tdd/branch/master/graph/badge.svg?token=y6OUlCB4bC)](https://codecov.io/gh/nyu-devops/lab-flask-tdd)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/nyu-devops/lab-flask-tdd)
 
 NYU DevOps lab on **Test Driven Development**
 

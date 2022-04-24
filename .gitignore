@@ -5,8 +5,8 @@ Thumbs.db
 # Vagrant
 .vagrant/
 
-# VS Code
-.vscode/
+# pipenv virtual environment
+.venv
 
 # Test reports
 unittests.xml

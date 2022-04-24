@@ -1,0 +1,22 @@
+// Test tasks for NYU course DevOps and Agile Methodologies taught by John Rofrano
+// Copyright Shuhong Cai 2021. Licensed under the Apache License, Version 2.0
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "TDD tests",
+            "type": "shell",
+            "command": "nosetests",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        }
+    ]
+        
+}
