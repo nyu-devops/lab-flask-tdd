@@ -21,7 +21,7 @@ Test cases can be run with the following:
   codecov --token=$CODECOV_TOKEN
 
   While debugging just these tests it's convenient to use this:
-    nosetests --stop tests/test_service.py:TestPetServer
+    nosetests --stop tests/test_service.py:TestPetService
 """
 
 import os
@@ -36,7 +36,7 @@ from .factories import PetFactory
 
 # Disable all but critical errors during normal test run
 # uncomment for debugging failing tests
-logging.disable(logging.CRITICAL)
+# logging.disable(logging.CRITICAL)
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 DATABASE_URI = os.getenv(
@@ -47,9 +47,9 @@ CONTENT_TYPE_JSON = "application/json"
 
 
 ######################################################################
-#  T E S T   C A S E S
+#  T E S T   P E T   S E R V I C E
 ######################################################################
-class TestPetServer(unittest.TestCase):
+class TestPetService(unittest.TestCase):
     """Pet Server Tests"""
 
     @classmethod
@@ -92,6 +92,10 @@ class TestPetServer(unittest.TestCase):
             pets.append(test_pet)
         return pets
 
+    ######################################################################
+    #  T E S T   C A S E S
+    ######################################################################
+
     def test_index(self):
         """Test the Home Page"""
         resp = self.app.get("/")
@@ -111,9 +115,7 @@ class TestPetServer(unittest.TestCase):
         """Get a single Pet"""
         # get the id of a pet
         test_pet = self._create_pets(1)[0]
-        resp = self.app.get(
-            f"{BASE_URL}/{test_pet.id}", content_type=CONTENT_TYPE_JSON
-        )
+        resp = self.app.get(f"{BASE_URL}/{test_pet.id}")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data["name"], test_pet.name)
@@ -131,7 +133,9 @@ class TestPetServer(unittest.TestCase):
         test_pet = PetFactory()
         logging.debug("Test Pet: %s", test_pet.serialize())
         resp = self.app.post(
-            BASE_URL, json=test_pet.serialize(), content_type=CONTENT_TYPE_JSON
+            BASE_URL, 
+            json=test_pet.serialize(), 
+            content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         
@@ -150,50 +154,19 @@ class TestPetServer(unittest.TestCase):
         resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_pet = resp.get_json()
-        self.assertEqual(new_pet["name"], test_pet.name, "Names do not match")
+        self.assertEqual(new_pet["name"], test_pet.name)
         self.assertEqual(new_pet["category"], test_pet.category)
         self.assertEqual(new_pet["available"], test_pet.available)
         self.assertEqual(new_pet["gender"], test_pet.gender.name)
-
-    # def test_create_pet_no_data(self):
-    #     """Create a Pet with missing data"""
-    #     resp = self.app.post(BASE_URL, json={}, content_type=CONTENT_TYPE_JSON)
-    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    # def test_create_pet_no_content_type(self):
-    #     """Create a Pet with no content type"""
-    #     resp = self.app.post(BASE_URL)
-    #     self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-    # def test_create_pet_bad_available(self):
-    #     """ Create a Pet with bad available data """
-    #     test_pet = PetFactory()
-    #     logging.debug(test_pet)
-    #     # change available to a string
-    #     test_pet.available = "true"
-    #     resp = self.app.post(
-    #         BASE_URL, json=test_pet.serialize(), content_type="application/json"
-    #     )
-    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    # def test_create_pet_bad_gender(self):
-    #     """ Create a Pet with bad available data """
-    #     pet = PetFactory()
-    #     logging.debug(pet)
-    #     # change gender to a bad string
-    #     test_pet = pet.serialize()
-    #     test_pet["gender"] = "male"    # wrong case
-    #     resp = self.app.post(
-    #         BASE_URL, json=test_pet, content_type="application/json"
-    #     )
-    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_pet(self):
         """Update an existing Pet"""
         # create a pet to update
         test_pet = PetFactory()
         resp = self.app.post(
-            BASE_URL, json=test_pet.serialize(), content_type=CONTENT_TYPE_JSON
+            BASE_URL, 
+            json=test_pet.serialize(), 
+            content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
@@ -213,15 +186,11 @@ class TestPetServer(unittest.TestCase):
     def test_delete_pet(self):
         """Delete a Pet"""
         test_pet = self._create_pets(1)[0]
-        resp = self.app.delete(
-            f"{BASE_URL}/{test_pet.id}", content_type=CONTENT_TYPE_JSON
-        )
+        resp = self.app.delete(f"{BASE_URL}/{test_pet.id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         # make sure they are deleted
-        resp = self.app.get(
-            f"{BASE_URL}/{test_pet.id}", content_type=CONTENT_TYPE_JSON
-        )
+        resp = self.app.get(f"{BASE_URL}/{test_pet.id}")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_query_pet_list_by_category(self):
@@ -230,7 +199,8 @@ class TestPetServer(unittest.TestCase):
         test_category = pets[0].category
         category_pets = [pet for pet in pets if pet.category == test_category]
         resp = self.app.get(
-            BASE_URL, query_string="category={}".format(quote_plus(test_category))
+            BASE_URL,
+            query_string=f"category={quote_plus(test_category)}"
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -238,6 +208,55 @@ class TestPetServer(unittest.TestCase):
         # check the data just to be sure
         for pet in data:
             self.assertEqual(pet["category"], test_category)
+
+    ######################################################################
+    #  T E S T   S A D   P A T H S
+    ######################################################################
+
+    # def test_create_pet_no_data(self):
+    #     """Create a Pet with missing data"""
+    #     resp = self.app.post(
+    #         BASE_URL, 
+    #         json={}, 
+    #         content_type=CONTENT_TYPE_JSON
+    #     )
+    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # def test_create_pet_no_content_type(self):
+    #     """Create a Pet with no content type"""
+    #     resp = self.app.post(BASE_URL)
+    #     self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    # def test_create_pet_bad_available(self):
+    #     """ Create a Pet with bad available data """
+    #     test_pet = PetFactory()
+    #     logging.debug(test_pet)
+    #     # change available to a string
+    #     test_pet.available = "true"
+    #     resp = self.app.post(
+    #         BASE_URL, 
+    #         json=test_pet.serialize(), 
+    #         content_type=CONTENT_TYPE_JSON
+    #     )
+    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # def test_create_pet_bad_gender(self):
+    #     """ Create a Pet with bad available data """
+    #     pet = PetFactory()
+    #     logging.debug(pet)
+    #     # change gender to a bad string
+    #     test_pet = pet.serialize()
+    #     test_pet["gender"] = "male"    # wrong case
+    #     resp = self.app.post(
+    #         BASE_URL, 
+    #         json=test_pet, 
+    #         content_type=CONTENT_TYPE_JSON
+    #     )
+    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    ######################################################################
+    #  T E S T   M O C K S
+    ######################################################################
 
     # @patch('service.routes.Pet.find_by_name')
     # def test_bad_request(self, bad_request_mock):
