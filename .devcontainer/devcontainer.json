@@ -23,9 +23,8 @@
 		"redhat.vscode-yaml",
 		"streetsidesoftware.code-spell-checker",
 		"wholroyd.jinja",
-		"bbenoist.vagrant",
-        "SonarSource.sonarlint-vscode"
+		"bbenoist.vagrant"
 	],
 	//"forwardPorts": [8000],
-	"postCreateCommand": "pipenv install --dev"
+	"postCreateCommand": "sudo pip install -r requirements.txt"
 }
