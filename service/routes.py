@@ -24,7 +24,7 @@ PUT /pets/{id} - updates a Pet record in the database
 DELETE /pets/{id} - deletes a Pet record in the database
 """
 
-from flask import jsonify, request, url_for, make_response, abort
+from flask import jsonify, request, url_for, abort
 from service.models import Pet
 from . import status  # HTTP Status Codes
 from . import app  # Import Flask application
@@ -65,7 +65,7 @@ def list_pets():
 
     results = [pet.serialize() for pet in pets]
     app.logger.info("Returning %d pets", len(results))
-    return make_response(jsonify(results), status.HTTP_200_OK)
+    return jsonify(results), status.HTTP_200_OK
 
 
 ######################################################################
@@ -84,7 +84,7 @@ def get_pets(pet_id):
         abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
 
     app.logger.info("Returning pet: %s", pet.name)
-    return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
+    return jsonify(pet.serialize()), status.HTTP_200_OK
 
 
 ######################################################################
@@ -105,9 +105,7 @@ def create_pets():
     location_url = url_for("get_pets", pet_id=pet.id, _external=True)
 
     app.logger.info("Pet with ID [%s] created.", pet.id)
-    return make_response(
-        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-    )
+    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
 ######################################################################
@@ -132,7 +130,7 @@ def update_pets(pet_id):
     pet.update()
 
     app.logger.info("Pet with ID [%s] updated.", pet.id)
-    return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
+    return jsonify(pet.serialize()), status.HTTP_200_OK
 
 
 ######################################################################
@@ -151,7 +149,7 @@ def delete_pets(pet_id):
         pet.delete()
 
     app.logger.info("Pet with ID [%s] delete complete.", pet_id)
-    return make_response("", status.HTTP_204_NO_CONTENT)
+    return "", status.HTTP_204_NO_CONTENT
 
 
 ######################################################################
