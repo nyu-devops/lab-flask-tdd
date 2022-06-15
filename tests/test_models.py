@@ -60,7 +60,7 @@ class TestPetModel(unittest.TestCase):
 
     def setUp(self):
         """This runs before each test"""
-        db.session.query(Pet).delete() # clean up the last tests
+        db.session.query(Pet).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -105,7 +105,7 @@ class TestPetModel(unittest.TestCase):
         pet.id = None
         pet.create()
         self.assertIsNotNone(pet.id)
-        # Fetch it back 
+        # Fetch it back
         found_pet = Pet.find(pet.id)
         self.assertEqual(found_pet.id, pet.id)
         self.assertEqual(found_pet.name, pet.name)

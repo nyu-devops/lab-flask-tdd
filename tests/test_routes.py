@@ -70,7 +70,7 @@ class TestPetService(unittest.TestCase):
     def setUp(self):
         """Runs before each test"""
         self.app = app.test_client()
-        db.session.query(Pet).delete() # clean up the last tests
+        db.session.query(Pet).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -133,23 +133,23 @@ class TestPetService(unittest.TestCase):
         test_pet = PetFactory()
         logging.debug("Test Pet: %s", test_pet.serialize())
         resp = self.app.post(
-            BASE_URL, 
-            json=test_pet.serialize(), 
+            BASE_URL,
+            json=test_pet.serialize(),
             content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        
+
         # Make sure location header is set
         location = resp.headers.get("Location", None)
         self.assertIsNotNone(location)
-        
+
         # Check the data is correct
         new_pet = resp.get_json()
         self.assertEqual(new_pet["name"], test_pet.name)
         self.assertEqual(new_pet["category"], test_pet.category)
         self.assertEqual(new_pet["available"], test_pet.available)
         self.assertEqual(new_pet["gender"], test_pet.gender.name)
-        
+
         # Check that the location header was correct
         resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -216,8 +216,8 @@ class TestPetService(unittest.TestCase):
     # def test_create_pet_no_data(self):
     #     """It should not Create a Pet with missing data"""
     #     resp = self.app.post(
-    #         BASE_URL, 
-    #         json={}, 
+    #         BASE_URL,
+    #         json={},
     #         content_type=CONTENT_TYPE_JSON
     #     )
     #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
@@ -234,8 +234,8 @@ class TestPetService(unittest.TestCase):
     #     # change available to a string
     #     test_pet.available = "true"
     #     resp = self.app.post(
-    #         BASE_URL, 
-    #         json=test_pet.serialize(), 
+    #         BASE_URL,
+    #         json=test_pet.serialize(),
     #         content_type=CONTENT_TYPE_JSON
     #     )
     #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
@@ -248,8 +248,8 @@ class TestPetService(unittest.TestCase):
     #     test_pet = pet.serialize()
     #     test_pet["gender"] = "male"    # wrong case
     #     resp = self.app.post(
-    #         BASE_URL, 
-    #         json=test_pet, 
+    #         BASE_URL,
+    #         json=test_pet,
     #         content_type=CONTENT_TYPE_JSON
     #     )
     #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)

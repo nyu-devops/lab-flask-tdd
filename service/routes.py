@@ -29,6 +29,7 @@ from service.models import Pet
 from . import status  # HTTP Status Codes
 from . import app  # Import Flask application
 
+
 ######################################################################
 # GET INDEX
 ######################################################################
