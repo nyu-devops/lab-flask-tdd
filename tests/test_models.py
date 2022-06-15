@@ -30,7 +30,7 @@ from datetime import date
 from werkzeug.exceptions import NotFound
 from service.models import Pet, Gender, DataValidationError, db
 from service import app
-from .factories import PetFactory
+from tests.factories import PetFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
