@@ -26,7 +26,7 @@ DELETE /pets/{id} - deletes a Pet record in the database
 
 from flask import jsonify, request, url_for, abort
 from service.models import Pet
-from . import status  # HTTP Status Codes
+from service.utils import status  # HTTP Status Codes
 from . import app  # Import Flask application
 
 

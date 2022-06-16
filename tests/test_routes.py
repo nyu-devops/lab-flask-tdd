@@ -30,7 +30,8 @@ import unittest
 
 # from unittest.mock import MagicMock, patch
 from urllib.parse import quote_plus
-from service import app, status
+from service import app
+from service.utils import status
 from service.models import db, init_db, Pet
 from tests.factories import PetFactory
 
