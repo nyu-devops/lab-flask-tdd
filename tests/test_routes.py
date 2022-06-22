@@ -82,9 +82,7 @@ class TestPetService(unittest.TestCase):
         pets = []
         for _ in range(count):
             test_pet = PetFactory()
-            response = self.client.post(
-                BASE_URL, json=test_pet.serialize(), content_type=CONTENT_TYPE_JSON
-            )
+            response = self.client.post(BASE_URL, json=test_pet.serialize())
             self.assertEqual(
                 response.status_code, status.HTTP_201_CREATED, "Could not create test pet"
             )
@@ -133,11 +131,7 @@ class TestPetService(unittest.TestCase):
         """It should Create a new Pet"""
         test_pet = PetFactory()
         logging.debug("Test Pet: %s", test_pet.serialize())
-        response = self.client.post(
-            BASE_URL,
-            json=test_pet.serialize(),
-            content_type=CONTENT_TYPE_JSON
-        )
+        response = self.client.post(BASE_URL, json=test_pet.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Make sure location header is set
@@ -164,11 +158,7 @@ class TestPetService(unittest.TestCase):
         """It should Update an existing Pet"""
         # create a pet to update
         test_pet = PetFactory()
-        response = self.client.post(
-            BASE_URL,
-            json=test_pet.serialize(),
-            content_type=CONTENT_TYPE_JSON
-        )
+        response = self.client.post(BASE_URL, json=test_pet.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # update the pet
@@ -214,46 +204,34 @@ class TestPetService(unittest.TestCase):
     #  T E S T   S A D   P A T H S
     ######################################################################
 
-    # def test_create_pet_no_data(self):
-    #     """It should not Create a Pet with missing data"""
-    #     response = self.client.post(
-    #         BASE_URL,
-    #         json={},
-    #         content_type=CONTENT_TYPE_JSON
-    #     )
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    def test_create_pet_no_data(self):
+        """It should not Create a Pet with missing data"""
+        response = self.client.post(BASE_URL, json={})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # def test_create_pet_no_content_type(self):
-    #     """It should not Create a Pet with no content type"""
-    #     response = self.client.post(BASE_URL)
-    #     self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+    def test_create_pet_no_content_type(self):
+        """It should not Create a Pet with no content type"""
+        response = self.client.post(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
-    # def test_create_pet_bad_available(self):
-    #     """It should not Create a Pet with bad available data"""
-    #     test_pet = PetFactory()
-    #     logging.debug(test_pet)
-    #     # change available to a string
-    #     test_pet.available = "true"
-    #     response = self.client.post(
-    #         BASE_URL,
-    #         json=test_pet.serialize(),
-    #         content_type=CONTENT_TYPE_JSON
-    #     )
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    def test_create_pet_bad_available(self):
+        """It should not Create a Pet with bad available data"""
+        test_pet = PetFactory()
+        logging.debug(test_pet)
+        # change available to a string
+        test_pet.available = "true"
+        response = self.client.post(BASE_URL, json=test_pet.serialize())
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # def test_create_pet_bad_gender(self):
-    #     """It should not Create a Pet with bad gender data"""
-    #     pet = PetFactory()
-    #     logging.debug(pet)
-    #     # change gender to a bad string
-    #     test_pet = pet.serialize()
-    #     test_pet["gender"] = "male"    # wrong case
-    #     response = self.client.post(
-    #         BASE_URL,
-    #         json=test_pet,
-    #         content_type=CONTENT_TYPE_JSON
-    #     )
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    def test_create_pet_bad_gender(self):
+        """It should not Create a Pet with bad gender data"""
+        pet = PetFactory()
+        logging.debug(pet)
+        # change gender to a bad string
+        test_pet = pet.serialize()
+        test_pet["gender"] = "male"    # wrong case
+        response = self.client.post(BASE_URL, json=test_pet)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     ######################################################################
     #  T E S T   M O C K S
