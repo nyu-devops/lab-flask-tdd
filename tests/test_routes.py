@@ -44,7 +44,6 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
 BASE_URL = "/pets"
-CONTENT_TYPE_JSON = "application/json"
 
 
 ######################################################################
@@ -146,7 +145,7 @@ class TestPetService(unittest.TestCase):
         self.assertEqual(new_pet["gender"], test_pet.gender.name)
 
         # Check that the location header was correct
-        response = self.client.get(location, content_type=CONTENT_TYPE_JSON)
+        response = self.client.get(location)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         new_pet = response.get_json()
         self.assertEqual(new_pet["name"], test_pet.name)
@@ -165,11 +164,7 @@ class TestPetService(unittest.TestCase):
         new_pet = response.get_json()
         logging.debug(new_pet)
         new_pet["category"] = "unknown"
-        response = self.client.put(
-            f"{BASE_URL}/{new_pet['id']}",
-            json=new_pet,
-            content_type=CONTENT_TYPE_JSON,
-        )
+        response = self.client.put(f"{BASE_URL}/{new_pet['id']}", json=new_pet)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_pet = response.get_json()
         self.assertEqual(updated_pet["category"], "unknown")
