@@ -1,5 +1,6 @@
 {
     "makefile.extensionOutputFolder": "./.vscode",
+    "git.mergeEditor": true,
     "python.pythonPath": "/usr/local/bin/python",
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": true,
