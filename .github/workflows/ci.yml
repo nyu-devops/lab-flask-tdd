@@ -53,7 +53,9 @@ jobs:
           flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Run unit tests with nose
-        run: nosetests
+        run: |
+          export FLASK_APP=service:app
+          nosetests
         env:
           DATABASE_URI: "postgresql://postgres:pgs3cr3t@postgres:5432/testdb"
 
