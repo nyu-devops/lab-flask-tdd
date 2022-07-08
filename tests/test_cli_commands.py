@@ -2,6 +2,7 @@ from unittest import TestCase
 from click.testing import CliRunner
 from service.utils.cli_commands import create_db
 
+
 class TestFlaskCLI(TestCase):
     """Test Flask CLI Commands"""
 
