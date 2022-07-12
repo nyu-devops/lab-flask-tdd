@@ -1,4 +1,5 @@
 {
+    "markdown-preview-github-styles.colorTheme": "light",
     "makefile.extensionOutputFolder": "./.vscode",
     "git.mergeEditor": true,
     "python.pythonPath": "/usr/local/bin/python",
