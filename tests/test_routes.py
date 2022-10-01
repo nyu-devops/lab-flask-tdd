@@ -26,12 +26,12 @@ Test cases can be run with the following:
 
 import os
 import logging
-import unittest
+from unittest import TestCase
 
 # from unittest.mock import MagicMock, patch
 from urllib.parse import quote_plus
 from service import app
-from service.utils import status
+from service.common import status
 from service.models import db, init_db, Pet
 from tests.factories import PetFactory
 
@@ -49,7 +49,7 @@ BASE_URL = "/pets"
 ######################################################################
 #  T E S T   P E T   S E R V I C E
 ######################################################################
-class TestPetService(unittest.TestCase):
+class TestPetService(TestCase):
     """Pet Server Tests"""
 
     @classmethod
@@ -100,6 +100,14 @@ class TestPetService(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(data["name"], "Pet Demo REST API Service")
+
+    def test_health(self):
+        """It should be healthy"""
+        response = self.client.get("/healthcheck")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["status"], 200)
+        self.assertEqual(data["message"], "Healthy")
 
     def test_get_pet_list(self):
         """It should Get a list of Pets"""

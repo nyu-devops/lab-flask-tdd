@@ -82,7 +82,7 @@ class Pet(db.Model):
     ##################################################
 
     def __repr__(self):
-        return "<Pet %r id=[%s]>" % (self.name, self.id)
+        return f"<Pet {self.name} id=[{self.id}]>"
 
     def create(self):
         """
@@ -139,13 +139,13 @@ class Pet(db.Model):
             self.gender = getattr(Gender, data["gender"])  # create enum from string
             self.birthday = date.fromisoformat(data["birthday"])
         except AttributeError as error:
-            raise DataValidationError("Invalid attribute: " + error.args[0])
+            raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
-            raise DataValidationError("Invalid pet: missing " + error.args[0])
+            raise DataValidationError("Invalid pet: missing " + error.args[0]) from error
         except TypeError as error:
             raise DataValidationError(
                 "Invalid pet: body of request contained bad or no data " + str(error)
-            )
+            ) from error
         return self
 
     ##################################################

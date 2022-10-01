@@ -21,16 +21,16 @@ and SQL database
 import sys
 from flask import Flask
 from service import config
-from service.utils import log_handlers
+from service.common import log_handlers
 
 # Create Flask application
 app = Flask(__name__)
 app.config.from_object(config)
 
 # Dependencies require we import the routes AFTER the Flask app is created
-# pylint: disable=wrong-import-position, wrong-import-order
+# pylint: disable=wrong-import-position, wrong-import-order, cyclic-import
 from service import routes, models        # noqa: F401, E402
-from service.utils import error_handlers, cli_commands  # noqa: F401, E402
+from service.common import error_handlers, cli_commands  # noqa: F401, E402
 
 # Set up logging for production
 log_handlers.init_logging(app, "gunicorn.error")
