@@ -14,6 +14,7 @@ unittests.xml
 # database files
 db/*
 !db/.keep
+*.db
 
 # SonarQube Reports
 .scannerwork/

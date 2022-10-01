@@ -26,9 +26,17 @@ DELETE /pets/{id} - deletes a Pet record in the database
 
 from flask import jsonify, request, url_for, abort
 from service.models import Pet
-from service.utils import status  # HTTP Status Codes
+from service.common import status  # HTTP Status Codes
 from . import app  # Import Flask application
 
+
+######################################################################
+# GET HEALTH CHECK
+######################################################################
+@app.route("/healthcheck")
+def healthcheck():
+    """Let them know our heart is still beating"""
+    return make_response(jsonify(status=200, message="Healthy"), status.HTTP_200_OK)
 
 ######################################################################
 # GET INDEX
@@ -158,13 +166,20 @@ def delete_pets(pet_id):
 ######################################################################
 
 
-def check_content_type(media_type):
+def check_content_type(content_type):
     """Checks that the media type is correct"""
-    content_type = request.headers.get("Content-Type")
-    if content_type and content_type == media_type:
+    if "Content-Type" not in request.headers:
+        app.logger.error("No Content-Type specified.")
+        abort(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            f"Content-Type must be {content_type}",
+        )
+
+    if request.headers["Content-Type"] == content_type:
         return
-    app.logger.error("Invalid Content-Type: %s", content_type)
+
+    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
     abort(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        "Content-Type must be {}".format(media_type),
+        f"Content-Type must be {content_type}",
     )

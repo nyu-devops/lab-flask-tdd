@@ -26,12 +26,12 @@ Test cases can be run with the following:
 
 import os
 import logging
-import unittest
+from unittest import TestCase
 
 # from unittest.mock import MagicMock, patch
 from urllib.parse import quote_plus
 from service import app
-from service.utils import status
+from service.common import status
 from service.models import db, init_db, Pet
 from tests.factories import PetFactory
 
@@ -49,7 +49,7 @@ BASE_URL = "/pets"
 ######################################################################
 #  T E S T   P E T   S E R V I C E
 ######################################################################
-class TestPetService(unittest.TestCase):
+class TestPetService(TestCase):
     """Pet Server Tests"""
 
     @classmethod
