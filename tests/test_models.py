@@ -153,7 +153,7 @@ class TestPetModel(unittest.TestCase):
         pets = Pet.all()
         self.assertEqual(pets, [])
         # Create 5 Pets
-        for i in range(5):
+        for _ in range(5):
             pet = PetFactory()
             pet.create()
         # See if we get back 5 pets
