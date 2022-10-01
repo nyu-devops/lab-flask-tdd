@@ -74,7 +74,7 @@ class TestPetModel(unittest.TestCase):
     def test_create_a_pet(self):
         """It should Create a pet and assert that it exists"""
         pet = Pet(name="Fido", category="dog", available=True, gender=Gender.MALE)
-        self.assertEqual(str(pet), "<Pet 'Fido' id=[None]>")
+        self.assertEqual(str(pet), "<Pet Fido id=[None]>")
         self.assertTrue(pet is not None)
         self.assertEqual(pet.id, None)
         self.assertEqual(pet.name, "Fido")
