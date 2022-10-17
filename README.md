@@ -103,13 +103,14 @@ $ nosetests --with-coverage --cover-package=service
 
 Try and get as close to 100% coverage as you can.
 
-It's also a good idea to make sure that your Python code follows the PEP8 standard. `flake8` has been included in the `requirements.txt` file so that you can check if your code is compliant like this:
+It's also a good idea to make sure that your Python code follows the PEP8 standard. Both `flake8` and `pylint` have been included in the `requirements.txt` file so that you can check if your code is compliant like this:
 
 ```shell
-$ flake8 --count --max-complexity=10 --statistics service
+$ flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+$ pylint service tests --max-line-length=127
 ```
 
-I've also included `pylint` in the requirements. Visual Studio Code is configured to use `pylint` while you are editing. This catches a lot of errors while you code that would normally be caught at runtime. It's a good idea to always code with pylint active.
+Visual Studio Code is configured to use `pylint` while you are editing. This catches a lot of errors while you code that would normally be caught at runtime. It's a good idea to always code with pylint active.
 
 ## Running the service
 
