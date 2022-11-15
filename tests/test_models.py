@@ -250,17 +250,15 @@ class TestPetModel(unittest.TestCase):
 
     def test_find_by_name(self):
         """It should Find a Pet by Name"""
-        pets = PetFactory.create_batch(5)
+        pets = PetFactory.create_batch(10)
         for pet in pets:
             pet.create()
         name = pets[0].name
+        count = len([pet for pet in pets if pet.name == name])
         found = Pet.find_by_name(name)
-        self.assertEqual(found.count(), 1)
-        self.assertEqual(found[0].category, pets[0].category)
-        self.assertEqual(found[0].name, pets[0].name)
-        self.assertEqual(found[0].available, pets[0].available)
-        self.assertEqual(found[0].gender, pets[0].gender)
-        self.assertEqual(found[0].birthday, pets[0].birthday)
+        self.assertEqual(found.count(), count)
+        for pet in found:
+            self.assertEqual(pet.name, name)
 
     def test_find_by_availability(self):
         """It should Find Pets by Availability"""
