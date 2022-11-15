@@ -26,3 +26,4 @@ codecov==2.1.12
 # Utilities
 httpie==3.2.1
 
+setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
