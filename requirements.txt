@@ -1,5 +1,5 @@
 # Werkzeug keeps breaking Flask!
-Werkzeug==2.1.2
+Werkzeug==2.2.3
 
 # Runtime dependencies
 Flask==2.1.2
