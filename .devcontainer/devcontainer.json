@@ -5,27 +5,32 @@
 	"service": "app",
 	"workspaceFolder": "/app",
 	"remoteUser": "devops",
-	"extensions": [
-		"VisualStudioExptTeam.vscodeintellicode",
-		"ms-python.python",
-        "ms-python.pylint",
-		"ms-python.vscode-pylance",
-		"alexkrechik.cucumberautocomplete",
-		"cstrap.flask-snippets",
-		"yzhang.markdown-all-in-one",
-		"bierner.github-markdown-preview",
-		"hnw.vscode-auto-open-markdown-preview",
-		"DavidAnson.vscode-markdownlint",
-		"donjayamanne.githistory",
-		"GitHub.vscode-pull-request-github",
-		"hbenl.vscode-test-explorer",
-		"LittleFoxTeam.vscode-python-test-adapter",
-		"njpwerner.autodocstring",
-		"redhat.vscode-yaml",
-		"streetsidesoftware.code-spell-checker",
-		"wholroyd.jinja",
-		"bbenoist.vagrant"
-	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"VisualStudioExptTeam.vscodeintellicode",
+				"ms-python.python",
+				"ms-python.pylint",
+				"ms-python.vscode-pylance",
+				"alexkrechik.cucumberautocomplete",
+				"cstrap.flask-snippets",
+				"yzhang.markdown-all-in-one",
+				"bierner.github-markdown-preview",
+				"hnw.vscode-auto-open-markdown-preview",
+				"DavidAnson.vscode-markdownlint",
+				"donjayamanne.githistory",
+				"GitHub.vscode-pull-request-github",
+				"hbenl.vscode-test-explorer",
+				"LittleFoxTeam.vscode-python-test-adapter",
+				"njpwerner.autodocstring",
+				"rangav.vscode-thunder-client",
+				"redhat.vscode-yaml",
+				"streetsidesoftware.code-spell-checker",
+				"wholroyd.jinja",
+				"bbenoist.vagrant"
+			]		
+		}
+	},
 	//"forwardPorts": [8000],
 	"postCreateCommand": "sudo pip install -r requirements.txt"
 }
