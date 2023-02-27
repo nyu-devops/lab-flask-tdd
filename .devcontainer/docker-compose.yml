@@ -14,7 +14,7 @@ services:
       FLASK_APP: service:app
       FLASK_DEBUG: "True"
       GUNICORN_BIND: "0.0.0.0:8000"
-      DATABASE_URI: postgresql://postgres:pgs3cr3t@postgres:5432/postgres
+      DATABASE_URI: postgresql://postgres:postgres@postgres:5432/postgres
     networks:
       - dev
     depends_on:
@@ -25,7 +25,7 @@ services:
     # ports:
     #   - 5432:5432
     environment:
-      POSTGRES_PASSWORD: pgs3cr3t
+      POSTGRES_PASSWORD: postgres
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:
