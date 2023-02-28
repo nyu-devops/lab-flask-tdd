@@ -4,7 +4,9 @@ version: "3"
 
 services:
   app:
-    image: rofrano/nyu-devops-base:sp23
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
     hostname: nyu
     container_name: lab-flask-tdd
     volumes:
