@@ -32,5 +32,5 @@
 		}
 	},
 	//"forwardPorts": [8000],
-	"postCreateCommand": "git config --global --add safe.directory /app"
+	// "postCreateCommand": ""
 }
