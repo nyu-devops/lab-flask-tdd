@@ -163,6 +163,30 @@ def delete_pets(pet_id):
 
 
 ######################################################################
+# PURCHASE A PET
+######################################################################
+@app.route("/pets/<int:pet_id>/purchase", methods=["PUT"])
+def purchase_pets(pet_id):
+    """Purchasing a Pet makes it unavailable"""
+    pet = Pet.find(pet_id)
+    if not pet:
+        abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
+    if not pet.available:
+        abort(
+            status.HTTP_409_CONFLICT,
+            f"Pet with id '{pet_id}' is not available.",
+        )
+
+    # At this point you would execute code to purchase the pet
+    # For the moment, we will just set them to unavailable
+
+    pet.available = False
+    pet.update()
+
+    return pet.serialize(), status.HTTP_200_OK
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
