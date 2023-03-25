@@ -242,6 +242,31 @@ class TestPetService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     ######################################################################
+    #  T E S T   A C T I O N S
+    ######################################################################
+
+    def test_purchase_a_pet(self):
+        """It should Purchase a Pet"""
+        pets = self._create_pets(10)
+        available_pets = [pet for pet in pets if pet.available is True]
+        pet = available_pets[0]
+        response = self.client.put(f"{BASE_URL}/{pet.id}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(f"{BASE_URL}/{pet.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        logging.debug("Response data: %s", data)
+        self.assertEqual(data["available"], False)
+
+    def test_purchase_not_available(self):
+        """It should not Purchase a Pet that is not available"""
+        pets = self._create_pets(10)
+        unavailable_pets = [pet for pet in pets if pet.available is False]
+        pet = unavailable_pets[0]
+        response = self.client.put(f"{BASE_URL}/{pet.id}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+    ######################################################################
     #  T E S T   M O C K S
     ######################################################################
 
