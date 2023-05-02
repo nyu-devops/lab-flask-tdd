@@ -3,7 +3,7 @@ Werkzeug==2.2.3
 SQLAlchemy==2.0.0
 
 # Runtime dependencies
-Flask==2.2.3
+Flask==2.3.2
 Flask-SQLAlchemy==3.0.2
 psycopg2==2.9.5
 python-dotenv==0.21.1
