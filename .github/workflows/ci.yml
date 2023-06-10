@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     # use a known build environment
-    container: python:3.9-slim
+    container: python:3.11-slim
 
     # Required services    
     services:
@@ -55,10 +55,10 @@ jobs:
           # Run pylint on the service
           pylint service --max-line-length=127
 
-      - name: Run unit tests with nose
+      - name: Run unit tests with green
         run: |
           export FLASK_APP=service:app
-          nosetests
+          green
         env:
           DATABASE_URI: "postgresql://postgres:pgs3cr3t@postgres:5432/testdb"
 

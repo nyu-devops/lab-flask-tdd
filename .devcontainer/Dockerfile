@@ -1,4 +1,4 @@
-FROM rofrano/nyu-devops-base:sp23
+FROM rofrano/nyu-devops-base:su23
 
 # Add Python package requiremnets to the dev environment
 WORKDIR /app
