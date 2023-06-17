@@ -6,7 +6,7 @@
         {
             "label": "TDD tests",
             "type": "shell",
-            "command": "nosetests",
+            "command": "green",
             "group": {
                 "kind": "test",
                 "isDefault": true
