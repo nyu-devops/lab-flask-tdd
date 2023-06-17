@@ -1,6 +1,5 @@
 # Dependencies for this lab
 Flask
-nose
-pinocchio
+green
 coverage
 pylint
