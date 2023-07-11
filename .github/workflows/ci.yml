@@ -1,6 +1,12 @@
 name: CI Build
 on:
   push:
+    branches:
+      - master
+    paths-ignore:
+    - 'README.md'
+    - '.vscode/**'
+
   pull_request:
     branches:
       - master
