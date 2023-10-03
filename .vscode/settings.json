@@ -3,9 +3,7 @@
     "makefile.extensionOutputFolder": "./.vscode",
     "git.mergeEditor": true,
     "python.pythonPath": "/usr/local/bin/python",
-    "python.linting.enabled": true,
-    "python.linting.pylintEnabled": true,
-    "python.testing.pytestEnabled": false,
+    "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": true,
     "python.testing.unittestArgs": [
         "-v",
@@ -13,14 +11,5 @@
         "./tests",
         "-p",
         "test*.py"
-    ],
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "**/*.pyc": true,
-        "**/__pycache__": true
-    }    
+    ]
 }

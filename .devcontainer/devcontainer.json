@@ -7,12 +7,27 @@
 	"remoteUser": "vscode",
 	"customizations": {
 		"vscode": {
+			"settings": {
+				"[python]": {
+					"editor.defaultFormatter": "ms-python.black-formatter",
+					"editor.formatOnSave": true
+				},
+				"python.linting.enabled": true,
+				"python.linting.pylintEnabled": true,
+				"markdown-preview-github-styles.colorTheme": "light",
+				"files.exclude": {
+					"**/.git": true,
+					"**/.DS_Store": true,
+					"**/*.pyc": true,
+					"**/__pycache__": true,
+					"**/.pytest_cache": true
+				}
+			},
 			"extensions": [
 				"VisualStudioExptTeam.vscodeintellicode",
 				"ms-python.python",
 				"ms-python.pylint",
 				"ms-python.vscode-pylance",
-				"alexkrechik.cucumberautocomplete",
 				"cstrap.flask-snippets",
 				"yzhang.markdown-all-in-one",
 				"bierner.github-markdown-preview",
@@ -31,7 +46,7 @@
 				"bbenoist.vagrant"
 			]		
 		}
-	},
+	}
 	//"forwardPorts": [8000],
 	// "postCreateCommand": ""
 }
