@@ -26,7 +26,7 @@ lint: ## Run the linter
 
 test: ## Run the unit tests
 	$(info Running tests...)
-	green -vvv --processes=1 --run-coverage --termcolor --minimum-coverage=95
+	pytest --disable-warnings
 
 ##@ Runtime
 
