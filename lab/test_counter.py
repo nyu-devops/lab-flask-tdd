@@ -5,7 +5,7 @@ Requirements for the counter service
 - The API must be RESTful.
 - The endpoint must be called `/counters`.
 - When creating a counter, you must specify the name in the path.
-- Duplicate names must return a conflict error code.
+- Duplicate names must return a 409 conflict error code.
 - The service must be able to update a counter by name.
 - The service must be able to get a counter's current value.
 - The service must be able to delete a counter.
