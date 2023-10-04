@@ -21,7 +21,7 @@ black==23.7.0
 pytest==7.4.0
 pytest-pspec==0.0.4
 pytest-cov==4.1.0
-
+green==3.4.3
 factory-boy==3.3.0
 coverage==7.3.0
 
