@@ -64,7 +64,7 @@ jobs:
       - name: Run unit tests with green
         run: |
           export FLASK_APP=service:app
-          pytest --disable-warnings
+          pytest --pspec --cov=service --cov-fail-under=95 --disable-warnings
         env:
           DATABASE_URI: "postgresql://postgres:pgs3cr3t@postgres:5432/testdb"
 
