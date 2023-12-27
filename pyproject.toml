@@ -2,7 +2,7 @@
 name = "service"
 version = "0.1.0"
 description = "NYU DevOps Lab for learning Test Driven Development"
-authors = ["John Rofrano <johnnyroy@johnrofrano.com>"]
+authors = ["John Rofrano"]
 license = "Apache 2.0"
 readme = "README.md"
 
