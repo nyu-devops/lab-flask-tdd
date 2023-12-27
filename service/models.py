@@ -31,18 +31,12 @@ available (boolean) - True for pets that are available for adoption
 import logging
 from enum import Enum
 from datetime import date
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 logger = logging.getLogger("flask.app")
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
-
-
-def init_db(app):
-    """Initialize the SQLAlchemy app"""
-    Pet.init_db(app)
 
 
 class DataValidationError(Exception):
@@ -153,20 +147,6 @@ class Pet(db.Model):
     ##################################################
 
     @classmethod
-    def init_db(cls, app: Flask):
-        """Initializes the database session
-
-        :param app: the Flask app
-        :type data: Flask
-
-        """
-        logger.info("Initializing database")
-        # This is where we initialize SQLAlchemy from the Flask app
-        db.init_app(app)
-        app.app_context().push()
-        db.create_all()  # make our sqlalchemy tables
-
-    @classmethod
     def all(cls) -> list:
         """Returns all of the Pets in the database"""
         logger.info("Processing all Pets")
@@ -184,21 +164,7 @@ class Pet(db.Model):
 
         """
         logger.info("Processing lookup for id %s ...", pet_id)
-        return cls.query.get(pet_id)
-
-    @classmethod
-    def find_or_404(cls, pet_id: int):
-        """Find a Pet by it's id
-
-        :param pet_id: the id of the Pet to find
-        :type pet_id: int
-
-        :return: an instance with the pet_id, or 404_NOT_FOUND if not found
-        :rtype: Pet
-
-        """
-        logger.info("Processing lookup or 404 for id %s ...", pet_id)
-        return cls.query.get_or_404(pet_id)
+        return cls.query.session.get(cls, pet_id)
 
     @classmethod
     def find_by_name(cls, name: str) -> list:

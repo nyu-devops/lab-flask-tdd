@@ -30,9 +30,10 @@ from unittest import TestCase
 
 # from unittest.mock import MagicMock, patch
 from urllib.parse import quote_plus
-from service import app
+from wsgi import app
+# from service import create_app
 from service.common import status
-from service.models import db, init_db, Pet
+from service.models import Pet, db
 from tests.factories import PetFactory
 
 # Disable all but critical errors during normal test run
@@ -45,6 +46,8 @@ DATABASE_URI = os.getenv(
 )
 BASE_URL = "/pets"
 
+# app = create_app()
+
 
 ######################################################################
 #  T E S T   P E T   S E R V I C E
@@ -52,6 +55,7 @@ BASE_URL = "/pets"
 class TestPetService(TestCase):
     """Pet Server Tests"""
 
+    # pylint: disable=duplicate-code
     @classmethod
     def setUpClass(cls):
         """Run once before all tests"""
@@ -60,7 +64,7 @@ class TestPetService(TestCase):
         # Set up the test database
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
-        init_db(app)
+        app.app_context().push()
 
     @classmethod
     def tearDownClass(cls):

@@ -34,6 +34,7 @@
 			"extensions": [
 				"ms-python.python",
 				"ms-python.vscode-pylance",
+				"VisualStudioExptTeam.vscodeintellicode",
 				"ms-python.pylint",
 				"ms-python.flake8",
 				"ms-python.black-formatter",
