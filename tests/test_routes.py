@@ -23,6 +23,7 @@ from unittest import TestCase
 # from unittest.mock import MagicMock, patch
 from urllib.parse import quote_plus
 from wsgi import app
+
 # from service import create_app
 from service.common import status
 from service.models import Pet, db
@@ -79,7 +80,9 @@ class TestPetService(TestCase):
             test_pet = PetFactory()
             response = self.client.post(BASE_URL, json=test_pet.serialize())
             self.assertEqual(
-                response.status_code, status.HTTP_201_CREATED, "Could not create test pet"
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test pet",
             )
             new_pet = response.get_json()
             test_pet.id = new_pet["id"]
@@ -189,8 +192,7 @@ class TestPetService(TestCase):
         test_category = pets[0].category
         category_pets = [pet for pet in pets if pet.category == test_category]
         response = self.client.get(
-            BASE_URL,
-            query_string=f"category={quote_plus(test_category)}"
+            BASE_URL, query_string=f"category={quote_plus(test_category)}"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
@@ -200,8 +202,45 @@ class TestPetService(TestCase):
             self.assertEqual(pet["category"], test_category)
 
     ######################################################################
-    #  T E S T   S A D   P A T H S
+    #  T E S T   A C T I O N S
     ######################################################################
+
+    def test_purchase_a_pet(self):
+        """It should Purchase a Pet"""
+        pets = self._create_pets(10)
+        available_pets = [pet for pet in pets if pet.available is True]
+        pet = available_pets[0]
+        response = self.client.put(f"{BASE_URL}/{pet.id}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(f"{BASE_URL}/{pet.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        logging.debug("Response data: %s", data)
+        self.assertEqual(data["available"], False)
+
+    def test_purchase_not_available(self):
+        """It should not Purchase a Pet that is not available"""
+        pets = self._create_pets(10)
+        unavailable_pets = [pet for pet in pets if pet.available is False]
+        pet = unavailable_pets[0]
+        response = self.client.put(f"{BASE_URL}/{pet.id}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+
+######################################################################
+#  T E S T   S A D   P A T H S
+######################################################################
+class TestSadPaths(TestCase):
+    """Test REST Exception Handling"""
+
+    def setUp(self):
+        """Runs before each test"""
+        self.client = app.test_client()
+
+    def test_method_not_allowed(self):
+        """It should not allow update without a pet id"""
+        response = self.client.put(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_create_pet_no_data(self):
         """It should not Create a Pet with missing data"""
@@ -233,34 +272,9 @@ class TestPetService(TestCase):
         logging.debug(pet)
         # change gender to a bad string
         test_pet = pet.serialize()
-        test_pet["gender"] = "male"    # wrong case
+        test_pet["gender"] = "male"  # wrong case
         response = self.client.post(BASE_URL, json=test_pet)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    ######################################################################
-    #  T E S T   A C T I O N S
-    ######################################################################
-
-    def test_purchase_a_pet(self):
-        """It should Purchase a Pet"""
-        pets = self._create_pets(10)
-        available_pets = [pet for pet in pets if pet.available is True]
-        pet = available_pets[0]
-        response = self.client.put(f"{BASE_URL}/{pet.id}/purchase")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response = self.client.get(f"{BASE_URL}/{pet.id}")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        logging.debug("Response data: %s", data)
-        self.assertEqual(data["available"], False)
-
-    def test_purchase_not_available(self):
-        """It should not Purchase a Pet that is not available"""
-        pets = self._create_pets(10)
-        unavailable_pets = [pet for pet in pets if pet.available is False]
-        pet = unavailable_pets[0]
-        response = self.client.put(f"{BASE_URL}/{pet.id}/purchase")
-        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
     ######################################################################
     #  T E S T   M O C K S

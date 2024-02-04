@@ -85,8 +85,13 @@ class Pet(db.Model):
         logger.info("Creating %s", self.name)
         # id must be none to generate next primary key
         self.id = None  # pylint: disable=invalid-name
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            logger.error("Error creating record: %s", self)
+            raise DataValidationError(e) from e
 
     def update(self):
         """
@@ -95,13 +100,23 @@ class Pet(db.Model):
         logger.info("Saving %s", self.name)
         if not self.id:
             raise DataValidationError("Update called with empty ID field")
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            logger.error("Error updating record: %s", self)
+            raise DataValidationError(e) from e
 
     def delete(self):
         """Removes a Pet from the data store"""
         logger.info("Deleting %s", self.name)
-        db.session.delete(self)
-        db.session.commit()
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            logger.error("Error deleting record: %s", self)
+            raise DataValidationError(e) from e
 
     def serialize(self) -> dict:
         """Serializes a Pet into a dictionary"""
@@ -111,7 +126,7 @@ class Pet(db.Model):
             "category": self.category,
             "available": self.available,
             "gender": self.gender.name,  # convert enum to string
-            "birthday": self.birthday.isoformat()
+            "birthday": self.birthday.isoformat(),
         }
 
     def deserialize(self, data: dict):
@@ -135,7 +150,9 @@ class Pet(db.Model):
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
-            raise DataValidationError("Invalid pet: missing " + error.args[0]) from error
+            raise DataValidationError(
+                "Invalid pet: missing " + error.args[0]
+            ) from error
         except TypeError as error:
             raise DataValidationError(
                 "Invalid pet: body of request contained bad or no data " + str(error)

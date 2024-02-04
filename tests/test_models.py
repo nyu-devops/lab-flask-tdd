@@ -18,6 +18,7 @@ Test cases for Pet Model
 import os
 import logging
 from unittest import TestCase
+from unittest.mock import patch
 from datetime import date
 from wsgi import app
 from service.models import Pet, Gender, DataValidationError, db
@@ -216,6 +217,34 @@ class TestPetModel(TestCaseBase):
         data["gender"] = "male"  # wrong case
         pet = Pet()
         self.assertRaises(DataValidationError, pet.deserialize, data)
+
+
+######################################################################
+#  T E S T   E X C E P T I O N   H A N D L E R S
+######################################################################
+class TestExceptionHandlers(TestCaseBase):
+    """Pet Model Exception Handlers"""
+
+    @patch("service.models.db.session.commit")
+    def test_create_exception(self, exception_mock):
+        """It should catch a create exception"""
+        exception_mock.side_effect = Exception()
+        pet = PetFactory()
+        self.assertRaises(DataValidationError, pet.create)
+
+    @patch("service.models.db.session.commit")
+    def test_update_exception(self, exception_mock):
+        """It should catch a update exception"""
+        exception_mock.side_effect = Exception()
+        pet = PetFactory()
+        self.assertRaises(DataValidationError, pet.update)
+
+    @patch("service.models.db.session.commit")
+    def test_delete_exception(self, exception_mock):
+        """It should catch a delete exception"""
+        exception_mock.side_effect = Exception()
+        pet = PetFactory()
+        self.assertRaises(DataValidationError, pet.delete)
 
 
 ######################################################################
