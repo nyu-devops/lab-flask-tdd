@@ -14,14 +14,6 @@
 
 """
 Test cases for Pet Model
-
-Test cases can be run with:
-    nosetests
-    coverage report -m
-
-While debugging just these tests it's convenient to use this:
-    nosetests --stop tests/test_pets.py:TestPetModel
-
 """
 import os
 import logging

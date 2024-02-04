@@ -25,7 +25,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
 # Set up the Python development environment
 WORKDIR /app
 COPY pyproject.toml poetry.lock ./
-RUN python -m pip install poetry && \
+RUN python -m pip install -U pip poetry && \
     poetry config virtualenvs.create false && \
     poetry install
 
