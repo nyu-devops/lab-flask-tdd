@@ -24,7 +24,7 @@ jobs:
     services:
       # Label used to access the service container
       postgres:
-        image: postgres
+        image: postgres:15-alpine
         env:
           POSTGRES_PASSWORD: pgs3cr3t
           POSTGRES_DB: testdb
@@ -40,23 +40,19 @@ jobs:
     # Steps for the build
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      
-      - name: Install libraries for PostgreSQL
-        run: |
-          apt-get update
-          apt-get install -y gcc libpq-dev
-
+        uses: actions/checkout@v3
+              
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip wheel
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          python -m pip install -U pip poetry
+          poetry config virtualenvs.create false
+          poetry install
 
       - name: Linting
         run: |
           # stop the build if there are Python syntax errors or undefined names
           flake8 service tests --count --select=E9,F63,F7,F82 --show-source --statistics
-          # check for omplexity. The GitHub editor is 127 chars wide
+          # check for complexity. The GitHub editor is 127 chars wide
           flake8 service tests --count --max-complexity=10 --max-line-length=127 --statistics
           # Run pylint on the service
           pylint service tests --max-line-length=127
@@ -66,7 +62,7 @@ jobs:
           export FLASK_APP=service:app
           pytest --pspec --cov=service --cov-fail-under=95 --disable-warnings
         env:
-          DATABASE_URI: "postgresql://postgres:pgs3cr3t@postgres:5432/testdb"
+          DATABASE_URI: "postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/testdb"
 
       - name: Upload code coverage
         uses: codecov/codecov-action@v3.1.4

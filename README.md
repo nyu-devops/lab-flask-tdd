@@ -20,9 +20,9 @@ As Software Engineers we need to have the discipline to ensure that our code wor
 
 You can read more about my thoughts on TDD in the article: [A Case for Test Driven Development](https://johnrofrano.medium.com/a-case-for-test-driven-development-7d9a552e0a16)
 
-This lab introduces **Test Driven Development** using `PyUnit` and `nose` (a.k.a. `nosetests`). It also demonstrates how to create a simple RESTful service using Python Flask and PostgreSQL. The resource model is persistences using SQLAlchemy to keep the application simple. It's purpose is to show the correct API calls and return codes that should be used for a REST API.
+This lab introduces **Test Driven Development** using `PyUnit` and `PyTest`. It also demonstrates how to create a simple RESTful service using Python Flask and PostgreSQL. The resource model is persistence using SQLAlchemy to keep the application simple. It's purpose is to show the correct API calls and return codes that should be used for a REST API.
 
-**Note:** The base service code is contained in `routes.py` while the business logic for manipulating Pets is in the `models.py` file. This follows the popular Model View Controller (MVC) separation of duities by keeping the model separate from the controller. As such, we have two test suites: one for the model (`test_models.py`) and one for the service itself (`test_routes.py`)
+**Note:** The base service code is contained in `routes.py` while the business logic for manipulating Pets is in the `models.py` file. This follows the popular Model View Controller (MVC) separation of duties by keeping the model separate from the controller. As such, we have two test suites: one for the model (`test_models.py`) and one for the service itself (`test_routes.py`)
 
 ## Prerequisite Software Installation
 
@@ -45,8 +45,8 @@ You can read more about creating these environments in my article: [Creating Rep
 To bring up the development environment you should clone this repo, change into the repo directory:
 
 ```bash
-$ git clone https://github.com/nyu-devops/lab-flask-tdd.git
-$ cd lab-flask-tdd
+git clone https://github.com/nyu-devops/lab-flask-tdd.git
+cd lab-flask-tdd
 ```
 
 Depending on which development environment you created, pick from the following:
@@ -56,7 +56,7 @@ Depending on which development environment you created, pick from the following:
 Open Visual Studio Code using the `code .` command. VS Code will prompt you to reopen in a container and you should say **yes**. This will take a while as it builds the Docker image and creates a container from it to develop in.
 
 ```bash
-$ code .
+code .
 ```
 
 Note that there is a period `.` after the `code` command. This tells Visual Studio Code to open the editor and load the current folder of files.
@@ -68,9 +68,9 @@ Once the environment is loaded you should be placed at a `bash` prompt in the `/
 Bring up the virtual machine using Vagrant.
 
 ```shell
-$ vagrant up
-$ vagrant ssh
-$ cd /vagrant
+vagrant up
+vagrant ssh
+cd /vagrant
 ```
 
 This will place you in the virtual machine in the `/vagrant` folder which has been shared with your computer so that your source files can be edited outside of the VM and run inside of the VM.
@@ -79,35 +79,35 @@ This will place you in the virtual machine in the `/vagrant` folder which has be
 
 As developers we always want to run the tests before we change any code. That way we know if we broke the code or if someone before us did. Always run the test cases first!
 
-Run the tests using `nosetests`
+Run the unit tests using `pytest`
 
 ```shell
-$ nosetests
+make test
 ```
 
-Nose is configured via the included `setup.cfg` file to automatically include the flags `--with-spec --spec-color` so that red-green-refactor is meaningful. If you are in a command shell that supports colors, passing tests will be green while failing tests will be red.
+PyTest is configured via the included `setup.cfg` file to automatically include the `--pspec` flag so that red-green-refactor is meaningful. If you are in a command shell that supports colors, passing tests will be green while failing tests will be red.
 
-Nose is also configured to automatically run the `coverage` tool and you should see a percentage-of-coverage report at the end of your tests. If you want to see what lines of code were not tested use:
+PyTest is also configured to automatically run the `coverage` tool and you should see a percentage-of-coverage report at the end of your tests. If you want to see what lines of code were not tested use:
 
 ```shell
-$ coverage report -m
+coverage report -m
 ```
 
 This is particularly useful because it reports the line numbers for the code that have not been covered so you know which lines you want to target with new test cases to get higher code coverage.
 
-You can also manually run `nosetests` with `coverage` (but `setup.cfg` does this already)
+You can also manually run `pytest` with `coverage` (but `setup.cfg` does this already)
 
 ```shell
-$ nosetests --with-coverage --cover-package=service
+$ pytest --pspec --cov=service --cov-fail-under=95
 ```
 
 Try and get as close to 100% coverage as you can.
 
-It's also a good idea to make sure that your Python code follows the PEP8 standard. Both `flake8` and `pylint` have been included in the `requirements.txt` file so that you can check if your code is compliant like this:
+It's also a good idea to make sure that your Python code follows the PEP8 standard. Both `flake8` and `pylint` have been included in the `pyproject.toml` file so that you can check if your code is compliant like this:
 
 ```shell
-$ flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
-$ pylint service tests --max-line-length=127
+flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+pylint service tests --max-line-length=127
 ```
 
 Visual Studio Code is configured to use `pylint` while you are editing. This catches a lot of errors while you code that would normally be caught at runtime. It's a good idea to always code with pylint active.
@@ -117,7 +117,7 @@ Visual Studio Code is configured to use `pylint` while you are editing. This cat
 The project uses *honcho* which gets it's commands from the `Procfile`. To start the service simply use:
 
 ```shell
-$ honcho start
+honcho start
 ```
 
 You should be able to reach the service at: http://localhost:8000. The port that is used is controlled by an environment variable defined in the `.flaskenv` file which Flask uses to load it's configuration from the environment by default.
@@ -129,27 +129,27 @@ If you are using Visual Studio Code with Docker, simply existing Visual Studio C
 If you are using Vagrant and VirtualBox, when you are done, you can exit and shut down the vm with:
 
 ```shell
-$ exit
-$ vagrant halt
+exit
+vagrant halt
 ```
 
 If the VM is no longer needed you can remove it with:
 
 ```shell
-$ vagrant destroy
+vagrant destroy
 ```
 
 ## What's featured in the project?
 
-    * app/routes.py -- the main Service routes using Python Flask
-    * app/models.py -- the data model using SQLAlchemy
-    * tests/test_routes.py -- test cases against the Pet service
-    * tests/test_models.py -- test cases against the Pet model
+- app/routes.py -- the main Service routes using Python Flask
+- app/models.py -- the data model using SQLAlchemy
+- tests/test_routes.py -- test cases against the Pet service
+- tests/test_models.py -- test cases against the Pet model
 
 ## License
 
-Copyright (c) John Rofrano. All rights reserved.
+Copyright (c) 2016, 2024 [John Rofrano](https://www.linkedin.com/in/JohnRofrano/). All rights reserved.
 
 Licensed under the Apache License. See [LICENSE](LICENSE)
 
-This repo is part of the NYU masters class: **CSCI-GA.2820-001 DevOps and Agile Methodologies** conceived, created and taught by *John Rofrano*
+This repository is part of the New York University (NYU) masters class: **CSCI-GA.2820-001 DevOps and Agile Methodologies** created and taught by [John Rofrano](https://cs.nyu.edu/~rofrano/), Adjunct Instructor, NYU Courant Institute, Graduate Division, Computer Science, and NYU Stern School of Business.

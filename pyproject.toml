@@ -1,0 +1,71 @@
+[tool.poetry]
+name = "service"
+version = "0.1.0"
+description = "NYU DevOps Lab for learning Test Driven Development"
+authors = ["John Rofrano"]
+license = "Apache 2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Flask = "^3.0.2"
+Flask-SQLAlchemy = "^3.1.1"
+psycopg = {extras = ["binary"], version = "^3.1.17"}
+retry = "^0.9.2"
+python-dotenv = "^1.0.1"
+gunicorn = "^21.2.0"
+
+[tool.poetry.group.dev.dependencies]
+honcho = "^1.1.0"
+pylint = "^3.0.2"
+flake8 = "^6.1.0"
+black = "^23.10.1"
+pytest = "^7.4.3"
+pytest-pspec = "^0.0.4"
+pytest-cov = "^4.1.0"
+factory-boy = "^3.3.0"
+coverage = "^7.3.2"
+httpie = "^3.2.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+#
+# Tool configurations
+#
+
+[tool.pylint.'MESSAGES CONTROL']
+max-line-length = 127
+disable = "no-member,protected-access,global-statement"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--pspec --cov=service --cov-fail-under=95"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["service"]
+omit = [
+    "venv/*",
+    ".venv/*"
+]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "pragma: no branch",
+    "pass",
+    "subprocess.CalledProcessError",
+    "sys.exit",
+    "if __name__ == .__main__.:"
+]
+ignore_errors = true
+
+[tool.coverage.xml]
+output="./coverage.xml"
+
+[tool.coverage.html]
+title = "Test Coverage Report"
+directory = "coverage_html_report"

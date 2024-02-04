@@ -14,14 +14,6 @@
 
 """
 Pet API Service Test Suite
-
-Test cases can be run with the following:
-  nosetests -v --with-spec --spec-color
-  coverage report -m
-  codecov --token=$CODECOV_TOKEN
-
-  While debugging just these tests it's convenient to use this:
-    nosetests --stop tests/test_service.py:TestPetService
 """
 
 import os
@@ -30,9 +22,10 @@ from unittest import TestCase
 
 # from unittest.mock import MagicMock, patch
 from urllib.parse import quote_plus
-from service import app
+from wsgi import app
+# from service import create_app
 from service.common import status
-from service.models import db, init_db, Pet
+from service.models import Pet, db
 from tests.factories import PetFactory
 
 # Disable all but critical errors during normal test run
@@ -41,9 +34,11 @@ from tests.factories import PetFactory
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 DATABASE_URI = os.getenv(
-    "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
+    "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
 BASE_URL = "/pets"
+
+# app = create_app()
 
 
 ######################################################################
@@ -52,6 +47,7 @@ BASE_URL = "/pets"
 class TestPetService(TestCase):
     """Pet Server Tests"""
 
+    # pylint: disable=duplicate-code
     @classmethod
     def setUpClass(cls):
         """Run once before all tests"""
@@ -60,7 +56,7 @@ class TestPetService(TestCase):
         # Set up the test database
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
-        init_db(app)
+        app.app_context().push()
 
     @classmethod
     def tearDownClass(cls):
@@ -103,7 +99,7 @@ class TestPetService(TestCase):
 
     def test_health(self):
         """It should be healthy"""
-        response = self.client.get("/healthcheck")
+        response = self.client.get("/health")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(data["status"], 200)
