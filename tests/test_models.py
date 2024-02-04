@@ -28,15 +28,12 @@ import logging
 from unittest import TestCase
 from datetime import date
 from wsgi import app
-# from service import create_app
 from service.models import Pet, Gender, DataValidationError, db
 from tests.factories import PetFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
-
-# app = create_app()
 
 
 ######################################################################
@@ -54,7 +51,6 @@ class TestCaseBase(TestCase):
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
         app.app_context().push()
-        # Pet.init_db(app)
 
     @classmethod
     def tearDownClass(cls):
