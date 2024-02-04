@@ -1,6 +1,6 @@
 // spell: disable
 {
-	"name": "Python 3 & PostgeSQL",
+	"name": "Lab TDD",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/app",
@@ -14,14 +14,10 @@
 				},
 				"markdown-preview-github-styles.colorTheme": "light",
 				"makefile.extensionOutputFolder": "/tmp",
-				"python.testing.pytestEnabled": false,
-				"python.testing.unittestEnabled": true,
-				"python.testing.unittestArgs": [
-					"-v",
-					"-s",
-					"./tests",
-					"-p",
-					"test*.py"
+				"python.testing.unittestEnabled": false,
+				"python.testing.pytestEnabled": true,			
+				"python.testing.pytestArgs": [
+					"tests"
 				],
 				"files.exclude": {
 					"**/.git": true,
@@ -40,22 +36,25 @@
 				"ms-python.black-formatter",
 				"ms-vscode.makefile-tools",
 				"yzhang.markdown-all-in-one",
-				"bierner.github-markdown-preview",
 				"hnw.vscode-auto-open-markdown-preview",
-				"DavidAnson.vscode-markdownlint",
+				"davidanson.vscode-markdownlint",
+				"bierner.markdown-preview-github-styles",
+				"tamasfe.even-better-toml",
 				"donjayamanne.githistory",
 				"GitHub.vscode-pull-request-github",
 				"hbenl.vscode-test-explorer",
 				"LittleFoxTeam.vscode-python-test-adapter",
 				"njpwerner.autodocstring",
+				"wholroyd.jinja",
 				"redhat.vscode-yaml",
 				"rangav.vscode-thunder-client",
+				"redhat.fabric8-analytics",
 				"streetsidesoftware.code-spell-checker",
-				"wholroyd.jinja",
 				"ms-azuretools.vscode-docker",
 				"github.vscode-github-actions",
+				"streetsidesoftware.code-spell-checker",				
 				"bbenoist.vagrant"
-			]		
+			]
 		}
 	}
 	//"forwardPorts": [8000],

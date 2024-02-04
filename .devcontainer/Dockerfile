@@ -19,6 +19,9 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
+# Install poetry stand alone
+# RUN curl -sSL https://install.python-poetry.org | python3 -
+
 # Set up the Python development environment
 WORKDIR /app
 COPY pyproject.toml poetry.lock ./
