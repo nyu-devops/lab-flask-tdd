@@ -38,7 +38,7 @@ All of these can be installed manually by clicking on the links above or you can
 
 Alternately, you can use [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/) to create a consistent development environment in a virtual machine (VM). 
 
-You can read more about creating these environments in my article: [Creating Reproducable Development Environments](https://johnrofrano.medium.com/creating-reproducible-development-environments-fac8d6471f35)
+You can read more about creating these environments in my article: [Creating Reproducible Development Environments](https://johnrofrano.medium.com/creating-reproducible-development-environments-fac8d6471f35)
 
 ## Bring up the development environment
 
@@ -95,7 +95,7 @@ coverage report -m
 
 This is particularly useful because it reports the line numbers for the code that have not been covered so you know which lines you want to target with new test cases to get higher code coverage.
 
-You can also manually run `pytest` with `coverage` (but `setup.cfg` does this already)
+You can also manually run `pytest` with `coverage` (but settings in `pyporojrct.toml` do this already)
 
 ```shell
 $ pytest --pspec --cov=service --cov-fail-under=95
@@ -106,7 +106,14 @@ Try and get as close to 100% coverage as you can.
 It's also a good idea to make sure that your Python code follows the PEP8 standard. Both `flake8` and `pylint` have been included in the `pyproject.toml` file so that you can check if your code is compliant like this:
 
 ```shell
-flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+make lint
+```
+
+Which does the equivalent of these commands:
+
+```shell
+flake8 service tests --count --select=E9,F63,F7,F82 --show-source --statistics
+flake8 service tests --count --max-complexity=10 --max-line-length=127 --statistics
 pylint service tests --max-line-length=127
 ```
 
@@ -114,10 +121,16 @@ Visual Studio Code is configured to use `pylint` while you are editing. This cat
 
 ## Running the service
 
-The project uses *honcho* which gets it's commands from the `Procfile`. To start the service simply use:
+The project uses `honcho` which gets it's commands from the `Procfile`. To start the service simply use:
 
 ```shell
 honcho start
+```
+
+As a convenience you can aso use:
+
+```shell
+make run
 ```
 
 You should be able to reach the service at: http://localhost:8000. The port that is used is controlled by an environment variable defined in the `.flaskenv` file which Flask uses to load it's configuration from the environment by default.
@@ -141,10 +154,11 @@ vagrant destroy
 
 ## What's featured in the project?
 
-- app/routes.py -- the main Service routes using Python Flask
-- app/models.py -- the data model using SQLAlchemy
-- tests/test_routes.py -- test cases against the Pet service
-- tests/test_models.py -- test cases against the Pet model
+- `service/__init__.py` -- establishes the Flask app factory
+- `service/routes.py` -- the main Service routes using Python Flask
+- `service/models.py` -- the data model using SQLAlchemy
+- `tests/test_routes.py` -- test cases against the Pet service
+- `tests/test_models.py` -- test cases against the Pet model
 
 ## License
 
