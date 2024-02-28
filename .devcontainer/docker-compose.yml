@@ -13,7 +13,7 @@ services:
       - ..:/app
     command: sleep infinity
     environment:
-      FLASK_APP: service:app
+      FLASK_APP: wsgi:app
       FLASK_DEBUG: "True"
       GUNICORN_BIND: "0.0.0.0:8000"
       DATABASE_URI: postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/postgres

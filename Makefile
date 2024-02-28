@@ -29,6 +29,10 @@ test: ## Run the unit tests
 	$(info Running tests...)
 	pytest --disable-warnings
 
+db-create: ## Creates the database tables
+	$(info Creating database tables...)
+	@flask db-create
+
 ##@ Runtime
 
 run: ## Run the service
