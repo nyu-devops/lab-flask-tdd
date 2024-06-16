@@ -10,31 +10,37 @@ all: help
 
 ##@ Development
 
+.PHONY: venv
 venv: ## Create a Python virtual environment
 	$(info Creating Python 3 virtual environment...)
 	poetry shell
 
+.PHONY: install
 install: ## Install Python dependencies
 	$(info Installing dependencies...)
 	poetry config virtualenvs.create false
 	poetry install
 
+.PHONY: lint
 lint: ## Run the linter
 	$(info Running linting...)
 	flake8 service tests --count --select=E9,F63,F7,F82 --show-source --statistics
 	flake8 service tests --count --max-complexity=10 --max-line-length=127 --statistics
 	pylint service tests --max-line-length=127
 
+.PHONY: test
 test: ## Run the unit tests
 	$(info Running tests...)
-	pytest --disable-warnings
+	export RETRY_COUNT=1; pytest --pspec --cov=service --cov-fail-under=95 --disable-warnings
 
-db-create: ## Creates the database tables
+.PHONY: db-init
+db-init: ## Initializes the database tables
 	$(info Creating database tables...)
 	@flask db-create
 
 ##@ Runtime
 
+.PHONY: run
 run: ## Run the service
 	$(info Starting service...)
 	honcho start
