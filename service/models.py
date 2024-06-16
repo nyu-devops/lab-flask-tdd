@@ -1,4 +1,4 @@
-# Copyright 2016, 2021 John Rofrano. All Rights Reserved.
+# Copyright 2016, 2024 John Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -26,17 +26,32 @@ Attributes:
 name (string) - the name of the pet
 category (string) - the category the pet belongs to (i.e., dog, cat)
 available (boolean) - True for pets that are available for adoption
+gender (enum) - the gender of the pet
+birthday (date) - the day the pet was born
 
 """
+import os
 import logging
-from enum import Enum
 from datetime import date
+from enum import Enum
+from retry import retry
 from flask_sqlalchemy import SQLAlchemy
+
+# global variables for retry (must be int)
+RETRY_COUNT = int(os.environ.get("RETRY_COUNT", 5))
+RETRY_DELAY = int(os.environ.get("RETRY_DELAY", 1))
+RETRY_BACKOFF = int(os.environ.get("RETRY_BACKOFF", 2))
 
 logger = logging.getLogger("flask.app")
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
+
+
+@retry(Exception, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
+def init_db() -> None:
+    """Initialize Tables"""
+    db.create_all()
 
 
 class DataValidationError(Exception):
@@ -70,6 +85,9 @@ class Pet(db.Model):
         db.Enum(Gender), nullable=False, server_default=(Gender.UNKNOWN.name)
     )
     birthday = db.Column(db.Date(), nullable=False, default=date.today())
+    # Database auditing fields
+    created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
+    last_updated = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now(), nullable=False)
 
     ##################################################
     # INSTANCE METHODS
@@ -78,9 +96,9 @@ class Pet(db.Model):
     def __repr__(self):
         return f"<Pet {self.name} id=[{self.id}]>"
 
-    def create(self):
+    def create(self) -> None:
         """
-        Creates a Pet to the database
+        Saves a Pet to the database
         """
         logger.info("Creating %s", self.name)
         # id must be none to generate next primary key
@@ -93,7 +111,7 @@ class Pet(db.Model):
             logger.error("Error creating record: %s", self)
             raise DataValidationError(e) from e
 
-    def update(self):
+    def update(self) -> None:
         """
         Updates a Pet to the database
         """
@@ -107,8 +125,10 @@ class Pet(db.Model):
             logger.error("Error updating record: %s", self)
             raise DataValidationError(e) from e
 
-    def delete(self):
-        """Removes a Pet from the data store"""
+    def delete(self) -> None:
+        """
+        Removes a Pet from the database
+        """
         logger.info("Deleting %s", self.name)
         try:
             db.session.delete(self)
@@ -126,7 +146,7 @@ class Pet(db.Model):
             "category": self.category,
             "available": self.available,
             "gender": self.gender.name,  # convert enum to string
-            "birthday": self.birthday.isoformat(),
+            "birthday": self.birthday.isoformat()
         }
 
     def deserialize(self, data: dict):
@@ -145,14 +165,13 @@ class Pet(db.Model):
                     "Invalid type for boolean [available]: "
                     + str(type(data["available"]))
                 )
-            self.gender = getattr(Gender, data["gender"])  # create enum from string
+            # self.gender = getattr(Gender, data["gender"])  # create enum from string
+            self.gender = Gender[data["gender"].upper()]  # create enum from string
             self.birthday = date.fromisoformat(data["birthday"])
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
-            raise DataValidationError(
-                "Invalid pet: missing " + error.args[0]
-            ) from error
+            raise DataValidationError("Invalid pet: missing " + error.args[0]) from error
         except TypeError as error:
             raise DataValidationError(
                 "Invalid pet: body of request contained bad or no data " + str(error)
@@ -222,6 +241,8 @@ class Pet(db.Model):
         :rtype: list
 
         """
+        if not isinstance(available, bool):
+            raise TypeError("Invalid availability, must be of type boolean")
         logger.info("Processing available query for %s ...", available)
         return cls.query.filter(cls.available == available)
 
@@ -236,5 +257,7 @@ class Pet(db.Model):
         :rtype: list
 
         """
+        if not isinstance(gender, Gender):
+            raise TypeError("Invalid gender, must be type Gender")
         logger.info("Processing gender query for %s ...", gender.name)
         return cls.query.filter(cls.gender == gender)

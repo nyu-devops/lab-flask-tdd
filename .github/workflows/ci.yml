@@ -48,7 +48,7 @@ jobs:
           poetry config virtualenvs.create false
           poetry install
 
-      - name: Linting
+      - name: Run Code Quality Checks
         run: |
           # stop the build if there are Python syntax errors or undefined names
           flake8 service tests --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -57,11 +57,11 @@ jobs:
           # Run pylint on the service
           pylint service tests --max-line-length=127
 
-      - name: Run unit tests with green
+      - name: Run unit tests with pytest
         run: |
-          export FLASK_APP=service:app
           pytest --pspec --cov=service --cov-fail-under=95 --disable-warnings
         env:
+          FLASK_APP: "wsgi:app"
           DATABASE_URI: "postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/testdb"
 
       - name: Upload code coverage
