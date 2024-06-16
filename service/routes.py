@@ -21,7 +21,7 @@ and Delete Pets from the inventory of pets in the PetShop
 
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
-from service.models import Pet
+from service.models import Pet, Gender
 from service.common import status  # HTTP Status Codes
 
 
@@ -61,14 +61,29 @@ def list_pets():
 
     pets = []
 
-    # See if any query filters were passed in
+    # Parse any arguments from the query string
     category = request.args.get("category")
     name = request.args.get("name")
+    available = request.args.get("available")
+    gender = request.args.get("gender")
+
     if category:
+        app.logger.info("Find by category: %s", category)
         pets = Pet.find_by_category(category)
     elif name:
+        app.logger.info("Find by name: %s", name)
         pets = Pet.find_by_name(name)
+    elif available:
+        app.logger.info("Find by available: %s", available)
+        # create bool from string
+        available_value = available.lower() in ["true", "yes", "1"]
+        pets = Pet.find_by_availability(available_value)
+    elif gender:
+        app.logger.info("Find by gender: %s", gender)
+        # create enum from string
+        pets = Pet.find_by_gender(Gender[gender.upper()])
     else:
+        app.logger.info("Find all")
         pets = Pet.all()
 
     results = [pet.serialize() for pet in pets]
@@ -86,11 +101,12 @@ def get_pets(pet_id):
 
     This endpoint will return a Pet based on it's id
     """
-    app.logger.info("Request for pet with id: %s", pet_id)
+    app.logger.info("Request to Retrieve a pet with id [%s]", pet_id)
 
+    # Attempt to find the Pet and abort if not found
     pet = Pet.find(pet_id)
     if not pet:
-        error(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
+        abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
 
     app.logger.info("Returning pet: %s", pet.name)
     return jsonify(pet.serialize()), status.HTTP_200_OK
@@ -102,21 +118,25 @@ def get_pets(pet_id):
 @app.route("/pets", methods=["POST"])
 def create_pets():
     """
-    Creates a Pet
-
+    Create a Pet
     This endpoint will create a Pet based the data in the body that is posted
     """
-    app.logger.info("Request to create a pet")
+    app.logger.info("Request to Create a Pet...")
     check_content_type("application/json")
 
     pet = Pet()
-    pet.deserialize(request.get_json())
-    pet.create()
-    message = pet.serialize()
-    location_url = url_for("get_pets", pet_id=pet.id, _external=True)
+    # Get the data from the request and deserialize it
+    data = request.get_json()
+    app.logger.info("Processing: %s", data)
+    pet.deserialize(data)
 
-    app.logger.info("Pet with ID: %d created.", pet.id)
-    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    # Save the new Pet to the database
+    pet.create()
+    app.logger.info("Pet with new id [%s] saved!", pet.id)
+
+    # Return the location of the new Pet
+    location_url = url_for("get_pets", pet_id=pet.id, _external=True)
+    return jsonify(pet.serialize()), status.HTTP_201_CREATED, {"Location": location_url}
 
 
 ######################################################################
@@ -129,15 +149,20 @@ def update_pets(pet_id):
 
     This endpoint will update a Pet based the body that is posted
     """
-    app.logger.info("Request to update pet with id: %d", pet_id)
+    app.logger.info("Request to Update a pet with id [%s]", pet_id)
     check_content_type("application/json")
 
+    # Attempt to find the Pet and abort if not found
     pet = Pet.find(pet_id)
     if not pet:
-        error(status.HTTP_404_NOT_FOUND, f"Pet with id: '{pet_id}' was not found.")
+        abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
 
-    pet.deserialize(request.get_json())
-    pet.id = pet_id
+    # Update the Pet with the new data
+    data = request.get_json()
+    app.logger.info("Processing: %s", data)
+    pet.deserialize(data)
+
+    # Save the updates to the database
     pet.update()
 
     app.logger.info("Pet with ID: %d updated.", pet.id)
@@ -154,14 +179,16 @@ def delete_pets(pet_id):
 
     This endpoint will delete a Pet based the id specified in the path
     """
-    app.logger.info("Request to delete pet with id: %d", pet_id)
+    app.logger.info("Request to Delete a pet with id [%s]", pet_id)
 
+    # Delete the Pet if it exists
     pet = Pet.find(pet_id)
     if pet:
+        app.logger.info("Pet with ID: %d found.", pet.id)
         pet.delete()
 
     app.logger.info("Pet with ID: %d delete complete.", pet_id)
-    return "", status.HTTP_204_NO_CONTENT
+    return {}, status.HTTP_204_NO_CONTENT
 
 
 ######################################################################
@@ -169,22 +196,19 @@ def delete_pets(pet_id):
 ######################################################################
 @app.route("/pets/<int:pet_id>/purchase", methods=["PUT"])
 def purchase_pets(pet_id):
-    """
-    Purchasing a Pet
-
-    This endpoint will purchase a pet makes it unavailable
-    """
+    """Purchasing a Pet makes it unavailable"""
     app.logger.info("Request to purchase pet with id: %d", pet_id)
 
+    # Attempt to find the Pet and abort if not found
     pet = Pet.find(pet_id)
     if not pet:
-        error(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
+        abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
 
     # you can only purchase pets that are available
     if not pet.available:
-        error(
+        abort(
             status.HTTP_409_CONFLICT,
-            f"Pet with ID: '{pet_id}' is not available.",
+            f"Pet with id '{pet_id}' is not available.",
         )
 
     # At this point you would execute code to purchase the pet
@@ -205,11 +229,11 @@ def purchase_pets(pet_id):
 ######################################################################
 # Checks the ContentType of a request
 ######################################################################
-def check_content_type(content_type):
+def check_content_type(content_type) -> None:
     """Checks that the media type is correct"""
     if "Content-Type" not in request.headers:
         app.logger.error("No Content-Type specified.")
-        error(
+        abort(
             status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
             f"Content-Type must be {content_type}",
         )
@@ -218,16 +242,7 @@ def check_content_type(content_type):
         return
 
     app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
-    error(
+    abort(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {content_type}",
     )
-
-
-######################################################################
-# Logs error messages before aborting
-######################################################################
-def error(status_code, reason):
-    """Logs the error and then aborts"""
-    app.logger.error(reason)
-    abort(status_code, reason)

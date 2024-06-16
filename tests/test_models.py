@@ -214,7 +214,7 @@ class TestPetModel(TestCaseBase):
         """It should not deserialize a bad gender attribute"""
         test_pet = PetFactory()
         data = test_pet.serialize()
-        data["gender"] = "male"  # wrong case
+        data["gender"] = "XXX"  # invalid gender
         pet = Pet()
         self.assertRaises(DataValidationError, pet.deserialize, data)
 
