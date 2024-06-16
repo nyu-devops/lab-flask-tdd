@@ -53,6 +53,7 @@ def init_db() -> None:
     """Initialize Tables"""
     db.create_all()
 
+
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
 
