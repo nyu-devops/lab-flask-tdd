@@ -45,8 +45,7 @@ def create_app():
         from service.common import error_handlers, cli_commands  # noqa: F401, E402
 
         try:
-            # models.init_db(app)  # make our sqlalchemy tables
-            db.create_all()
+            models.init_db()  # make our sqlalchemy tables
         except Exception as error:  # pylint: disable=broad-except
             app.logger.critical("%s: Cannot continue", error)
             # gunicorn requires exit code 4 to stop spawning workers when they die

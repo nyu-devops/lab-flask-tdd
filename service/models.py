@@ -30,16 +30,28 @@ gender (enum) - the gender of the pet
 birthday (date) - the day the pet was born
 
 """
+import os
 import logging
 from datetime import date
 from enum import Enum
+from retry import retry
 from flask_sqlalchemy import SQLAlchemy
+
+# global variables for retry (must be int)
+RETRY_COUNT = int(os.environ.get("RETRY_COUNT", 5))
+RETRY_DELAY = int(os.environ.get("RETRY_DELAY", 1))
+RETRY_BACKOFF = int(os.environ.get("RETRY_BACKOFF", 2))
 
 logger = logging.getLogger("flask.app")
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+
+@retry(Exception, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
+def init_db() -> None:
+    """Initialize Tables"""
+    db.create_all()
 
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
