@@ -3,7 +3,7 @@ FROM python:3.11-slim
 
 # Add any tools that are needed beyond Python 3.9
 RUN apt-get update && \
-    apt-get install -y sudo vim make git zip tree curl wget jq && \
+    apt-get install -y sudo vim make git zip tree curl wget jq procps net-tools && \
     apt-get autoremove -y && \
     apt-get clean -y
 
@@ -17,10 +17,12 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME -s /bin/bash \
     && usermod -aG sudo $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-    && chmod 0440 /etc/sudoers.d/$USERNAME
+    && chmod 0440 /etc/sudoers.d/$USERNAME \
+    && chown -R $USERNAME:$USERNAME /home/$USERNAME
 
 # Install poetry stand alone
-# RUN curl -sSL https://install.python-poetry.org | python3 -
+# RUN curl -sSL https://install.python-poetry.org | python3 - && \
+#     poetry config virtualenvs.create false
 
 # Set up the Python development environment
 WORKDIR /app

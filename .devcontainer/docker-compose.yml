@@ -16,7 +16,7 @@ services:
       FLASK_APP: wsgi:app
       FLASK_DEBUG: "True"
       GUNICORN_BIND: "0.0.0.0:8000"
-      DATABASE_URI: postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/postgres
+      DATABASE_URI: postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/petstore
     networks:
       - dev
     depends_on:
@@ -28,6 +28,7 @@ services:
     #   - 5432:5432
     environment:
       POSTGRES_PASSWORD: pgs3cr3t
+      POSTGRES_DB: petstore      
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:

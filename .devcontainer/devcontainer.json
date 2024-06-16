@@ -8,6 +8,13 @@
 	"customizations": {
 		"vscode": {
 			"settings": {
+				"cSpell.words": [
+					"sqlalchemy",
+					"psycopg",
+					"pytest",
+					"onupdate",
+					"testdb"
+				],				
 				"[python]": {
 					"editor.defaultFormatter": "ms-python.black-formatter",
 					"editor.formatOnSave": true
@@ -30,27 +37,26 @@
 			"extensions": [
 				"ms-python.python",
 				"ms-python.vscode-pylance",
-				"VisualStudioExptTeam.vscodeintellicode",
 				"ms-python.pylint",
 				"ms-python.flake8",
 				"ms-python.black-formatter",
+				"njpwerner.autodocstring",
+				"wholroyd.jinja",
 				"ms-vscode.makefile-tools",
 				"yzhang.markdown-all-in-one",
-				"hnw.vscode-auto-open-markdown-preview",
 				"davidanson.vscode-markdownlint",
+				"bierner.github-markdown-preview",
+				"hnw.vscode-auto-open-markdown-preview",
 				"bierner.markdown-preview-github-styles",
 				"tamasfe.even-better-toml",
 				"donjayamanne.githistory",
 				"GitHub.vscode-pull-request-github",
 				"hbenl.vscode-test-explorer",
 				"LittleFoxTeam.vscode-python-test-adapter",
-				"njpwerner.autodocstring",
-				"wholroyd.jinja",
 				"redhat.vscode-yaml",
 				"rangav.vscode-thunder-client",
-				"redhat.fabric8-analytics",
-				"streetsidesoftware.code-spell-checker",
 				"ms-azuretools.vscode-docker",
+				"redhat.fabric8-analytics",
 				"github.vscode-github-actions",
 				"streetsidesoftware.code-spell-checker",				
 				"bbenoist.vagrant"
