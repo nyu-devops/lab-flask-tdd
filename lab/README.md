@@ -8,6 +8,7 @@ Assume you have been asked to create a web service that can keep track of multip
 
 - The API must be RESTful.
 - The endpoint must be called `/counters`.
+- The data returned should be this `{"name":"some_name", "counter":0}`
 - When creating a counter, you must specify the name in the path.
 - Duplicate names must return a conflict error code.
 - The service must be able to update a counter by name.
