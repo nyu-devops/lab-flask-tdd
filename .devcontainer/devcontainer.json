@@ -54,9 +54,8 @@
 				"hbenl.vscode-test-explorer",
 				"LittleFoxTeam.vscode-python-test-adapter",
 				"redhat.vscode-yaml",
-				"rangav.vscode-thunder-client",
+				"unjinjang.rest-api-client",
 				"ms-azuretools.vscode-docker",
-				"redhat.fabric8-analytics",
 				"github.vscode-github-actions",
 				"streetsidesoftware.code-spell-checker",				
 				"bbenoist.vagrant"

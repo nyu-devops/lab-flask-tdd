@@ -1,7 +1,7 @@
 # Image for a Python 3 development environment
 FROM python:3.11-slim
 
-# Add any tools that are needed beyond Python 3.9
+# Add any tools that are needed beyond Python 3.11
 RUN apt-get update && \
     apt-get install -y sudo vim make git zip tree curl wget jq procps net-tools && \
     apt-get autoremove -y && \
@@ -20,18 +20,13 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
     && chown -R $USERNAME:$USERNAME /home/$USERNAME
 
-# Install poetry stand alone
-# RUN curl -sSL https://install.python-poetry.org | python3 - && \
-#     poetry config virtualenvs.create false
-
 # Set up the Python development environment
 WORKDIR /app
-COPY pyproject.toml poetry.lock ./
-RUN python -m pip install -U pip poetry && \
-    poetry config virtualenvs.create false && \
-    poetry install
+COPY Pipfile Pipfile.lock ./
+RUN python -m pip install -U pip pipenv && \
+    pipenv install --system --dev
 
-ENV PORT 8000
+ENV PORT=8000
 EXPOSE $PORT
 
 # Enable color terminal for docker exec bash
