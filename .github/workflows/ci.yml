@@ -58,7 +58,7 @@ jobs:
 
       - name: Run unit tests with pytest
         run: |
-          pytest --pspec --cov=service --cov-fail-under=95 --disable-warnings
+          pytest --pspec --cov=service --cov-fail-under=95 --disable-warnings --cov-report=xml
         env:
           FLASK_APP: "wsgi:app"
           DATABASE_URI: "postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/testdb"
