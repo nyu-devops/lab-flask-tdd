@@ -7,6 +7,7 @@ services:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
+    # image: lab-flask-tdd
     hostname: nyu
     container_name: lab-flask-tdd
     volumes:
