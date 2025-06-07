@@ -13,7 +13,8 @@
 					"psycopg",
 					"pytest",
 					"onupdate",
-					"testdb"
+					"testdb",
+					"petstore"
 				],				
 				"[python]": {
 					"editor.defaultFormatter": "ms-python.black-formatter",
