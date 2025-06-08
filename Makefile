@@ -13,13 +13,12 @@ all: help
 .PHONY: venv
 venv: ## Create a Python virtual environment
 	$(info Creating Python 3 virtual environment...)
-	poetry shell
+	pipenv shell
 
 .PHONY: install
 install: ## Install Python dependencies
 	$(info Installing dependencies...)
-	poetry config virtualenvs.create false
-	poetry install
+	sudo pipenv install --system --dev
 
 .PHONY: lint
 lint: ## Run the linter

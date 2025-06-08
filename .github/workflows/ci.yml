@@ -53,15 +53,21 @@ jobs:
           flake8 service tests --count --select=E9,F63,F7,F82 --show-source --statistics
           # check for complexity. The GitHub editor is 127 chars wide
           flake8 service tests --count --max-complexity=10 --max-line-length=127 --statistics
-          # Run pylint on the service
+          # Run pylint on the service package
           pylint service tests --max-line-length=127
 
       - name: Run unit tests with pytest
         run: |
-          pytest --pspec --cov=service --cov-fail-under=95 --disable-warnings
+          pytest --pspec --cov=service --cov-fail-under=95 --disable-warnings --cov-report=xml
         env:
           FLASK_APP: "wsgi:app"
           DATABASE_URI: "postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/testdb"
 
-      - name: Upload code coverage
-        uses: codecov/codecov-action@v3.1.4
+      - name: Install packages for Codecov to work
+        run: apt update && apt install -y git curl gpg
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: nyu-devops/lab-flask-tdd        
