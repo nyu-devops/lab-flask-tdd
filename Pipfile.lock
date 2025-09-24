@@ -872,11 +872,12 @@
         },
         "pip": {
             "hashes": [
-                "sha256:88f96547ea48b940a3a385494e181e29fb8637898f88d88737c5049780f196ea",
-                "sha256:c46efd13b6aa8279f33f2864459c8ce587ea6a1a59ee20de055868d8f7688f7f"
+                "sha256:578283f006390f85bb6282dffb876454593d637f5d1be494b5202ce4877e71f2",
+                "sha256:6d67a2b4e7f14d8b31b8b52648866fa717f45a1eb70e83002f4331d07e953717"
             ],
-            "markers": "python_version >= '3.8'",
-            "version": "==25.0.1"
+            "index": "pypi",
+            "markers": "python_version >= '3.9'",
+            "version": "==25.2"
         },
         "platformdirs": {
             "hashes": [
