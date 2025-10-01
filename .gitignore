@@ -10,6 +10,7 @@ Thumbs.db
 
 # Test reports
 unittests.xml
+.pytest_cache
 
 # database files
 db/*
