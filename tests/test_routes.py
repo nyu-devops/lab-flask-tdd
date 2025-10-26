@@ -84,7 +84,9 @@ class TestPetService(TestCase):
             test_pet = PetFactory()
             response = self.client.post(BASE_URL, json=test_pet.serialize())
             self.assertEqual(
-                response.status_code, status.HTTP_201_CREATED, "Could not create test pet"
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test pet",
             )
             new_pet = response.get_json()
             test_pet.id = new_pet["id"]
@@ -233,8 +235,7 @@ class TestPetService(TestCase):
         test_category = pets[0].category
         category_pets = [pet for pet in pets if pet.category == test_category]
         response = self.client.get(
-            BASE_URL,
-            query_string=f"category={quote_plus(test_category)}"
+            BASE_URL, query_string=f"category={quote_plus(test_category)}"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
@@ -254,9 +255,7 @@ class TestPetService(TestCase):
         logging.debug("Unavailable Pets [%d] %s", unavailable_count, unavailable_pets)
 
         # test for available
-        response = self.client.get(
-            BASE_URL, query_string="available=true"
-        )
+        response = self.client.get(BASE_URL, query_string="available=true")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), available_count)
@@ -265,9 +264,7 @@ class TestPetService(TestCase):
             self.assertEqual(pet["available"], True)
 
         # test for unavailable
-        response = self.client.get(
-            BASE_URL, query_string="available=false"
-        )
+        response = self.client.get(BASE_URL, query_string="available=false")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), unavailable_count)
@@ -296,9 +293,16 @@ class TestPetService(TestCase):
     # ----------------------------------------------------------
     def test_purchase_a_pet(self):
         """It should Purchase a Pet"""
-        pets = self._create_pets(10)
-        available_pets = [pet for pet in pets if pet.available is True]
-        pet = available_pets[0]
+        # Create a pet that is available for purchase
+        pet = PetFactory()
+        pet.available = True
+        response = self.client.post(BASE_URL, json=pet.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        data = response.get_json()
+        pet.id = data["id"]
+        self.assertEqual(data["available"], True)
+
+        # Call purchase on the created id and check the results
         response = self.client.put(f"{BASE_URL}/{pet.id}/purchase")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response = self.client.get(f"{BASE_URL}/{pet.id}")
@@ -369,16 +373,16 @@ class TestSadPaths(TestCase):
     #  T E S T   M O C K S
     ######################################################################
 
-    @patch('service.routes.Pet.find_by_name')
+    @patch("service.routes.Pet.find_by_name")
     def test_bad_request(self, bad_request_mock):
         """It should return a Bad Request error from Find By Name"""
         bad_request_mock.side_effect = DataValidationError()
-        response = self.client.get(BASE_URL, query_string='name=fido')
+        response = self.client.get(BASE_URL, query_string="name=fido")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch('service.routes.Pet.find_by_name')
+    @patch("service.routes.Pet.find_by_name")
     def test_mock_search_data(self, pet_find_mock):
         """It should showing how to mock data"""
-        pet_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'fido'})]
-        response = self.client.get(BASE_URL, query_string='name=fido')
+        pet_find_mock.return_value = [MagicMock(serialize=lambda: {"name": "fido"})]
+        response = self.client.get(BASE_URL, query_string="name=fido")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
