@@ -12,14 +12,19 @@ python-dotenv = "~=1.2.1"
 gunicorn = "~=25.0.0"
 
 [dev-packages]
-black = "~=26.1.0"
-coverage = "~=7.13.2"
-flake8 = "~=7.3.0"
+# Code Quality
 pylint = "~=4.0.4"
+flake8 = "~=7.3.0"
+black = "~=26.1.0"
+
+# Test-Driven Development
 pytest = "~=9.0.2"
 pytest-pspec = "~=0.0.4"
 pytest-cov = "~=7.0.0"
 factory-boy = "~=3.3.3"
+coverage = "~=7.13.2"
+
+# Utility
 honcho = "~=2.0.0"
 httpie = "~=3.2.4"
 
