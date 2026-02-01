@@ -4,24 +4,24 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "==3.1.1"
+flask = "==3.1.2"
 flask-sqlalchemy = "==3.1.1"
-psycopg = {extras = ["binary"], version = "==3.2.4"}
+psycopg = {extras = ["binary"], version = "==3.3.2"}
 retry2 = "==0.9.5"
-python-dotenv = "~=1.1.0"
-gunicorn = "~=23.0.0"
+python-dotenv = "~=1.2.1"
+gunicorn = "~=25.0.0"
 
 [dev-packages]
-black = "~=25.1.0"
-coverage = "~=7.8.2"
-flake8 = "~=7.2.0"
-pylint = "~=3.3.7"
-pytest = "~=8.3.5"
+black = "~=26.1.0"
+coverage = "~=7.13.2"
+flake8 = "~=7.3.0"
+pylint = "~=4.0.4"
+pytest = "~=9.0.2"
 pytest-pspec = "~=0.0.4"
-pytest-cov = "~=6.1.1"
+pytest-cov = "~=7.0.0"
 factory-boy = "~=3.3.3"
 honcho = "~=2.0.0"
 httpie = "~=3.2.4"
 
 [requires]
-python_version = "3.11"
+python_version = "3.12"
