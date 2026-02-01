@@ -1,5 +1,5 @@
 # Image for a Python 3 development environment
-FROM quay.io/rofrano/nyu-devops-base:su25
+FROM quay.io/rofrano/nyu-devops-base:sp26
 
 # Set up the Python development environment
 WORKDIR /app
