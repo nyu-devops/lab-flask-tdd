@@ -18,6 +18,7 @@ Package for the application models and service routes
 This module creates and configures the Flask app and sets up the logging
 and SQL database
 """
+
 import sys
 from flask import Flask
 from service import config
@@ -36,6 +37,7 @@ def create_app():
     # Initialize Plugins
     # pylint: disable=import-outside-toplevel
     from service.models import db
+
     db.init_app(app)
 
     with app.app_context():
@@ -54,9 +56,9 @@ def create_app():
         # Set up logging for production
         log_handlers.init_logging(app, "gunicorn.error")
 
-        app.logger.info("╔" + (60 * "═") + "╗")
-        app.logger.info("║" + "  P E T   S T O R E   S E R V I C E  ".center(60, " ") + "║")
-        app.logger.info("╚" + (60 * "═") + "╝")
+        app.logger.info("╔%s╗", (60 * "═"))
+        app.logger.info("║%s║", "  P E T   S T O R E   S E R V I C E  ".center(60, " "))
+        app.logger.info("╚%s╝", (60 * "═"))
 
         app.logger.info("Service initialized!")
 
