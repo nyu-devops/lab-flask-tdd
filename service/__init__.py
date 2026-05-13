@@ -54,9 +54,9 @@ def create_app():
         # Set up logging for production
         log_handlers.init_logging(app, "gunicorn.error")
 
-        app.logger.info(70 * "*")
-        app.logger.info("  P E T   S T O R E   S E R V I C E  ".center(70, "*"))
-        app.logger.info(70 * "*")
+        app.logger.info("╔" + (60 * "═") + "╗")
+        app.logger.info("║" + "  P E T   S T O R E   S E R V I C E  ".center(60, " ") + "║")
+        app.logger.info("╚" + (60 * "═") + "╝")
 
         app.logger.info("Service initialized!")
 
