@@ -12,6 +12,7 @@
 					"sqlalchemy",
 					"psycopg",
 					"pytest",
+					"pipenv",
 					"onupdate",
 					"testdb",
 					"petstore"
@@ -62,7 +63,8 @@
 				"bbenoist.vagrant"
 			]
 		}
-	}
-	//"forwardPorts": [8000],
+	},
+	// Setup the lab environment after container is created
+	"forwardPorts": [8000]
 	// "postCreateCommand": ""
 }
