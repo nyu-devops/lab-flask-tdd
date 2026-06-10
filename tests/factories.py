@@ -19,9 +19,9 @@ Test Factory to make fake objects for testing
 from datetime import date
 
 from factory.base import Factory
-from factory.declarations import Sequence
-from factory.faker import Faker
+from factory.declarations import LazyFunction, Sequence
 from factory.fuzzy import FuzzyChoice, FuzzyDate
+from .pet_name_provider import PetNameFaker
 from service.models import Pet, Gender
 
 
@@ -34,7 +34,7 @@ class PetFactory(Factory):
         model = Pet
 
     id = Sequence(lambda n: n)
-    name = Faker("first_name")
+    name = LazyFunction(lambda: PetNameFaker().pet_name())
     category = FuzzyChoice(choices=["dog", "cat", "bird", "fish"])
     available = FuzzyChoice(choices=[True, False])
     gender = FuzzyChoice(choices=[Gender.MALE, Gender.FEMALE, Gender.UNKNOWN])
