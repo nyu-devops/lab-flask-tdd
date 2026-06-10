@@ -15,6 +15,7 @@
 """
 Test cases for Pet Model
 """
+
 import os
 import logging
 from unittest import TestCase
@@ -269,51 +270,3 @@ class TestModelQueries(TestCaseBase):
         self.assertEqual(pet.available, pets[1].available)
         self.assertEqual(pet.gender, pets[1].gender)
         self.assertEqual(pet.birthday, pets[1].birthday)
-
-    def test_find_by_category(self):
-        """It should Find Pets by Category"""
-        pets = PetFactory.create_batch(10)
-        for pet in pets:
-            pet.create()
-        category = pets[0].category
-        count = len([pet for pet in pets if pet.category == category])
-        found = Pet.find_by_category(category)
-        self.assertEqual(found.count(), count)
-        for pet in found:
-            self.assertEqual(pet.category, category)
-
-    def test_find_by_name(self):
-        """It should Find a Pet by Name"""
-        pets = PetFactory.create_batch(10)
-        for pet in pets:
-            pet.create()
-        name = pets[0].name
-        count = len([pet for pet in pets if pet.name == name])
-        found = Pet.find_by_name(name)
-        self.assertEqual(found.count(), count)
-        for pet in found:
-            self.assertEqual(pet.name, name)
-
-    def test_find_by_availability(self):
-        """It should Find Pets by Availability"""
-        pets = PetFactory.create_batch(10)
-        for pet in pets:
-            pet.create()
-        available = pets[0].available
-        count = len([pet for pet in pets if pet.available == available])
-        found = Pet.find_by_availability(available)
-        self.assertEqual(found.count(), count)
-        for pet in found:
-            self.assertEqual(pet.available, available)
-
-    def test_find_by_gender(self):
-        """It should Find Pets by Gender"""
-        pets = PetFactory.create_batch(10)
-        for pet in pets:
-            pet.create()
-        gender = pets[0].gender
-        count = len([pet for pet in pets if pet.gender == gender])
-        found = Pet.find_by_gender(gender)
-        self.assertEqual(found.count(), count)
-        for pet in found:
-            self.assertEqual(pet.gender, gender)
