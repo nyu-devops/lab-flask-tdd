@@ -1,4 +1,4 @@
-# Copyright 2016, 2024 John J. Rofrano. All Rights Reserved.
+# Copyright 2016, 2026 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ and Delete Pets from the inventory of pets in the PetShop
 
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
-from service.models import Pet, Gender
+from service.models import Pet
 from service.common import status  # HTTP Status Codes
 
 
@@ -59,36 +59,12 @@ def list_pets():
     """Returns all of the Pets"""
     app.logger.info("Request for pet list")
 
-    pets = []
-
-    # Parse any arguments from the query string
-    category = request.args.get("category")
-    name = request.args.get("name")
-    available = request.args.get("available")
-    gender = request.args.get("gender")
-
-    if category:
-        app.logger.info("Find by category: %s", category)
-        pets = Pet.find_by_category(category)
-    elif name:
-        app.logger.info("Find by name: %s", name)
-        pets = Pet.find_by_name(name)
-    elif available:
-        app.logger.info("Find by available: %s", available)
-        # create bool from string
-        available_value = available.lower() in ["true", "yes", "1"]
-        pets = Pet.find_by_availability(available_value)
-    elif gender:
-        app.logger.info("Find by gender: %s", gender)
-        # create enum from string
-        pets = Pet.find_by_gender(Gender[gender.upper()])
-    else:
-        app.logger.info("Find all")
-        pets = Pet.all()
+    # Return all of the Pets
+    pets = Pet.all()
 
     results = [pet.serialize() for pet in pets]
     app.logger.info("Returning %d pets", len(results))
-    return jsonify(results), status.HTTP_200_OK
+    return results, status.HTTP_200_OK
 
 
 ######################################################################
@@ -109,7 +85,7 @@ def get_pets(pet_id):
         abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
 
     app.logger.info("Returning pet: %s", pet.name)
-    return jsonify(pet.serialize()), status.HTTP_200_OK
+    return pet.serialize(), status.HTTP_200_OK
 
 
 ######################################################################
@@ -136,7 +112,7 @@ def create_pets():
 
     # Return the location of the new Pet
     location_url = url_for("get_pets", pet_id=pet.id, _external=True)
-    return jsonify(pet.serialize()), status.HTTP_201_CREATED, {"Location": location_url}
+    return pet.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
 
 
 ######################################################################
@@ -166,7 +142,7 @@ def update_pets(pet_id):
     pet.update()
 
     app.logger.info("Pet with ID: %d updated.", pet.id)
-    return jsonify(pet.serialize()), status.HTTP_200_OK
+    return pet.serialize(), status.HTTP_200_OK
 
 
 ######################################################################
@@ -192,37 +168,9 @@ def delete_pets(pet_id):
 
 
 ######################################################################
-# PURCHASE A PET
-######################################################################
-@app.route("/pets/<int:pet_id>/purchase", methods=["PUT"])
-def purchase_pets(pet_id):
-    """Purchasing a Pet makes it unavailable"""
-    app.logger.info("Request to purchase pet with id: %d", pet_id)
-
-    # Attempt to find the Pet and abort if not found
-    pet = Pet.find(pet_id)
-    if not pet:
-        abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
-
-    # you can only purchase pets that are available
-    if not pet.available:
-        abort(
-            status.HTTP_409_CONFLICT,
-            f"Pet with id '{pet_id}' is not available.",
-        )
-
-    # At this point you would execute code to purchase the pet
-    # For the moment, we will just set them to unavailable
-
-    pet.available = False
-    pet.update()
-
-    app.logger.info("Pet with ID: %d has been purchased.", pet_id)
-    return pet.serialize(), status.HTTP_200_OK
-
-
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
+######################################################################
 ######################################################################
 
 

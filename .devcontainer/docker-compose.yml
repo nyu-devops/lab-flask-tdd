@@ -1,7 +1,5 @@
 ---
 # Python 3 with PostgreSQL
-version: "3"
-
 services:
   app:
     build:

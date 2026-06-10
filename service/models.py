@@ -30,6 +30,7 @@ gender (enum) - the gender of the pet
 birthday (date) - the day the pet was born
 
 """
+
 import os
 import logging
 from datetime import date
@@ -48,7 +49,13 @@ logger = logging.getLogger("flask.app")
 db = SQLAlchemy()
 
 
-@retry(Exception, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
+@retry(
+    Exception,
+    delay=RETRY_DELAY,
+    backoff=RETRY_BACKOFF,
+    tries=RETRY_COUNT,
+    logger=logger,
+)
 def init_db() -> None:
     """Initialize Tables"""
     db.create_all()
@@ -87,7 +94,9 @@ class Pet(db.Model):
     birthday = db.Column(db.Date(), nullable=False, default=date.today())
     # Database auditing fields
     created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
-    last_updated = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now(), nullable=False)
+    last_updated = db.Column(
+        db.DateTime, default=db.func.now(), onupdate=db.func.now(), nullable=False
+    )
 
     ##################################################
     # INSTANCE METHODS
@@ -146,7 +155,7 @@ class Pet(db.Model):
             "category": self.category,
             "available": self.available,
             "gender": self.gender.name,  # convert enum to string
-            "birthday": self.birthday.isoformat()
+            "birthday": self.birthday.isoformat(),
         }
 
     def deserialize(self, data: dict):
@@ -171,7 +180,9 @@ class Pet(db.Model):
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
-            raise DataValidationError("Invalid pet: missing " + error.args[0]) from error
+            raise DataValidationError(
+                "Invalid pet: missing " + error.args[0]
+            ) from error
         except TypeError as error:
             raise DataValidationError(
                 "Invalid pet: body of request contained bad or no data " + str(error)
@@ -201,63 +212,3 @@ class Pet(db.Model):
         """
         logger.info("Processing lookup for id %s ...", pet_id)
         return cls.query.session.get(cls, pet_id)
-
-    @classmethod
-    def find_by_name(cls, name: str) -> list:
-        """Returns all Pets with the given name
-
-        :param name: the name of the Pets you want to match
-        :type name: str
-
-        :return: a collection of Pets with that name
-        :rtype: list
-
-        """
-        logger.info("Processing name query for %s ...", name)
-        return cls.query.filter(cls.name == name)
-
-    @classmethod
-    def find_by_category(cls, category: str) -> list:
-        """Returns all of the Pets in a category
-
-        :param category: the category of the Pets you want to match
-        :type category: str
-
-        :return: a collection of Pets in that category
-        :rtype: list
-
-        """
-        logger.info("Processing category query for %s ...", category)
-        return cls.query.filter(cls.category == category)
-
-    @classmethod
-    def find_by_availability(cls, available: bool = True) -> list:
-        """Returns all Pets by their availability
-
-        :param available: True for pets that are available
-        :type available: str
-
-        :return: a collection of Pets that are available
-        :rtype: list
-
-        """
-        if not isinstance(available, bool):
-            raise TypeError("Invalid availability, must be of type boolean")
-        logger.info("Processing available query for %s ...", available)
-        return cls.query.filter(cls.available == available)
-
-    @classmethod
-    def find_by_gender(cls, gender: Gender = Gender.UNKNOWN) -> list:
-        """Returns all Pets by their Gender
-
-        :param gender: values are ['MALE', 'FEMALE', 'UNKNOWN']
-        :type available: enum
-
-        :return: a collection of Pets that are available
-        :rtype: list
-
-        """
-        if not isinstance(gender, Gender):
-            raise TypeError("Invalid gender, must be type Gender")
-        logger.info("Processing gender query for %s ...", gender.name)
-        return cls.query.filter(cls.gender == gender)

@@ -15,14 +15,17 @@
 """
 Test Factory to make fake objects for testing
 """
+
 from datetime import date
 
-import factory
+from factory.base import Factory
+from factory.declarations import LazyFunction, Sequence
 from factory.fuzzy import FuzzyChoice, FuzzyDate
 from service.models import Pet, Gender
+from .pet_name_provider import PetNameFaker
 
 
-class PetFactory(factory.Factory):
+class PetFactory(Factory):
     """Creates fake pets that you don't have to feed"""
 
     class Meta:  # pylint: disable=too-few-public-methods
@@ -30,8 +33,8 @@ class PetFactory(factory.Factory):
 
         model = Pet
 
-    id = factory.Sequence(lambda n: n)
-    name = factory.Faker("first_name")
+    id = Sequence(lambda n: n)
+    name = LazyFunction(lambda: PetNameFaker().pet_name())
     category = FuzzyChoice(choices=["dog", "cat", "bird", "fish"])
     available = FuzzyChoice(choices=[True, False])
     gender = FuzzyChoice(choices=[Gender.MALE, Gender.FEMALE, Gender.UNKNOWN])

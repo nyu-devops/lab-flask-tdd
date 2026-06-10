@@ -1,4 +1,4 @@
-# Copyright 2016, 2024 John J. Rofrano. All Rights Reserved.
+# Copyright 2016, 2026 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,12 +22,11 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
 # from unittest.mock import MagicMock, patch
-from urllib.parse import quote_plus
 from wsgi import app
 
 # from service import create_app
 from service.common import status
-from service.models import Pet, Gender, db, DataValidationError
+from service.models import Pet, db
 from tests.factories import PetFactory
 
 # Disable all but critical errors during normal test run
@@ -39,8 +38,6 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
 BASE_URL = "/pets"
-
-# app = create_app()
 
 
 ######################################################################
@@ -211,114 +208,6 @@ class TestPetService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
 
-    # ----------------------------------------------------------
-    # TEST QUERY
-    # ----------------------------------------------------------
-    def test_query_by_name(self):
-        """It should Query Pets by name"""
-        pets = self._create_pets(5)
-        test_name = pets[0].name
-        name_count = len([pet for pet in pets if pet.name == test_name])
-        response = self.client.get(
-            BASE_URL, query_string=f"name={quote_plus(test_name)}"
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        self.assertEqual(len(data), name_count)
-        # check the data just to be sure
-        for pet in data:
-            self.assertEqual(pet["name"], test_name)
-
-    def test_query_pet_list_by_category(self):
-        """It should Query Pets by Category"""
-        pets = self._create_pets(10)
-        test_category = pets[0].category
-        category_pets = [pet for pet in pets if pet.category == test_category]
-        response = self.client.get(
-            BASE_URL, query_string=f"category={quote_plus(test_category)}"
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        self.assertEqual(len(data), len(category_pets))
-        # check the data just to be sure
-        for pet in data:
-            self.assertEqual(pet["category"], test_category)
-
-    def test_query_by_availability(self):
-        """It should Query Pets by availability"""
-        pets = self._create_pets(10)
-        available_pets = [pet for pet in pets if pet.available is True]
-        unavailable_pets = [pet for pet in pets if pet.available is False]
-        available_count = len(available_pets)
-        unavailable_count = len(unavailable_pets)
-        logging.debug("Available Pets [%d] %s", available_count, available_pets)
-        logging.debug("Unavailable Pets [%d] %s", unavailable_count, unavailable_pets)
-
-        # test for available
-        response = self.client.get(BASE_URL, query_string="available=true")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        self.assertEqual(len(data), available_count)
-        # check the data just to be sure
-        for pet in data:
-            self.assertEqual(pet["available"], True)
-
-        # test for unavailable
-        response = self.client.get(BASE_URL, query_string="available=false")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        self.assertEqual(len(data), unavailable_count)
-        # check the data just to be sure
-        for pet in data:
-            self.assertEqual(pet["available"], False)
-
-    def test_query_by_gender(self):
-        """It should Query Pets by gender"""
-        pets = self._create_pets(10)
-        female_pets = [pet for pet in pets if pet.gender == Gender.FEMALE]
-        female_count = len(female_pets)
-        logging.debug("Female Pets [%d] %s", female_count, female_pets)
-
-        # test for available
-        response = self.client.get(BASE_URL, query_string="gender=female")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        self.assertEqual(len(data), female_count)
-        # check the data just to be sure
-        for pet in data:
-            self.assertEqual(pet["gender"], Gender.FEMALE.name)
-
-    # ----------------------------------------------------------
-    # TEST ACTIONS
-    # ----------------------------------------------------------
-    def test_purchase_a_pet(self):
-        """It should Purchase a Pet"""
-        # Create a pet that is available for purchase
-        pet = PetFactory()
-        pet.available = True
-        response = self.client.post(BASE_URL, json=pet.serialize())
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        data = response.get_json()
-        pet.id = data["id"]
-        self.assertEqual(data["available"], True)
-
-        # Call purchase on the created id and check the results
-        response = self.client.put(f"{BASE_URL}/{pet.id}/purchase")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response = self.client.get(f"{BASE_URL}/{pet.id}")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        logging.debug("Response data: %s", data)
-        self.assertEqual(data["available"], False)
-
-    def test_purchase_not_available(self):
-        """It should not Purchase a Pet that is not available"""
-        pets = self._create_pets(10)
-        unavailable_pets = [pet for pet in pets if pet.available is False]
-        pet = unavailable_pets[0]
-        response = self.client.put(f"{BASE_URL}/{pet.id}/purchase")
-        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
-
 
 ######################################################################
 #  T E S T   S A D   P A T H S
@@ -373,16 +262,9 @@ class TestSadPaths(TestCase):
     #  T E S T   M O C K S
     ######################################################################
 
-    @patch("service.routes.Pet.find_by_name")
-    def test_bad_request(self, bad_request_mock):
-        """It should return a Bad Request error from Find By Name"""
-        bad_request_mock.side_effect = DataValidationError()
-        response = self.client.get(BASE_URL, query_string="name=fido")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    @patch("service.routes.Pet.find_by_name")
+    @patch("service.routes.Pet.find")
     def test_mock_search_data(self, pet_find_mock):
         """It should showing how to mock data"""
-        pet_find_mock.return_value = [MagicMock(serialize=lambda: {"name": "fido"})]
-        response = self.client.get(BASE_URL, query_string="name=fido")
+        pet_find_mock.return_value = MagicMock(serialize=lambda: {"name": "fido"})
+        response = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
