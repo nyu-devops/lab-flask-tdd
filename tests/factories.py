@@ -21,8 +21,8 @@ from datetime import date
 from factory.base import Factory
 from factory.declarations import LazyFunction, Sequence
 from factory.fuzzy import FuzzyChoice, FuzzyDate
-from .pet_name_provider import PetNameFaker
 from service.models import Pet, Gender
+from .pet_name_provider import PetNameFaker
 
 
 class PetFactory(Factory):
