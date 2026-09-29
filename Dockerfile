@@ -2,7 +2,7 @@
 # Create production image
 ##################################################
 # cSpell: disable
-FROM quay.io/rofrano/python:3.12-slim
+FROM python:3.12-slim
 
 # Establish a working folder
 WORKDIR /app
