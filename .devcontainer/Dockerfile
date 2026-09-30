@@ -2,7 +2,7 @@
 # Image for a Python 3 development environment
 ##################################################
 # cSpell: disable
-FROM quay.io/rofrano/nyu-devops-base:su26
+FROM rofrano/nyu-devops-base:fa26
 
 # Set up the Python development environment
 WORKDIR /app

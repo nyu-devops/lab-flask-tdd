@@ -2,14 +2,14 @@
 # Create production image
 ##################################################
 # cSpell: disable
-FROM quay.io/rofrano/python:3.12-slim
+FROM python:3.12-slim
 
 # Establish a working folder
 WORKDIR /app
 
 # Set up the Python production environment
 COPY Pipfile Pipfile.lock ./
-RUN python -m pip install --upgrade pip pipenv && \
+RUN python -m pip install --upgrade pip pipenv --no-cache-dir && \
     pipenv install --system --deploy
 
 # Copy source files last because they change the most
