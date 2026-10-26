@@ -15,7 +15,7 @@ python-dotenv = "~=1.2.2"
 # Code Quality
 pylint = "~=4.0.5"
 flake8 = "~=7.3.0"
-black = "~=26.5.1"
+black = "~=26.10.1"
 
 # Test-Driven Development
 pytest = "~=9.0.3"
