@@ -13,7 +13,7 @@ python-dotenv = "~=1.2.2"
 
 [dev-packages]
 # Code Quality
-pylint = "~=4.0.5"
+pylint = "~=4.0.9"
 flake8 = "~=7.3.0"
 black = "~=26.10.1"
 
